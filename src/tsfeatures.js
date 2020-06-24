@@ -3,20 +3,20 @@ import LM from 'ml-levenberg-marquardt';
 
 /** get version info*/
 function version() {
-    return "v0.0.4";
+    return "v0.0.5";
 }
 
 function polynomial_1([p0, p1]) {
     return t => p0 + p1 * t;
 }
 function polynomial_2([p0, p1, p2]) {
-    return t => p0 + p1 * t + p2 * Math.pow(2);
+    return t => p0 + p1 * t + p2 * Math.pow(t,2);
 }
 function polynomial_3([p0, p1, p2, p3]) {
-    return t => p0 + p1 * t + p2 * Math.pow(2) + p3 * Math.pow(3);
+    return t => p0 + p1 * t + p2 * Math.pow(t,2) + p3 * Math.pow(t,3);
 }
 function polynomial_4([p0, p1, p2, p3, p4]) {
-    return t => p0 + p1 * t + p2 * Math.pow(2) + p3 * Math.pow(3) + p4 * Math.pow(4);
+    return t => p0 + p1 * t + p2 * Math.pow(t,2) + p3 * Math.pow(t,3) + p4 * Math.pow(t,4);
 }
 
 function fit_polynomial(x, y, polynomial, options) {
@@ -187,7 +187,7 @@ function characteristics(t, r) {
       });
       res.lm2 = fit_polynomial(t2, r2, polynomial_2, {
         damping: 1.5,
-        initialValues: [1, 1, 1]
+        initialValues: [res.lm1.parameterValues[0], res.lm1.parameterValues[1], 1]
       });
       res.lm3 = fit_polynomial(t2, r2, polynomial_3, {
         damping: 1.5,
