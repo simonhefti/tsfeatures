@@ -1,3 +1,8 @@
+/** get version info*/
+function version() {
+    return "v0.0.3";
+}
+
 /** get min, max, sum */
 function minmaxsum(y) {
     var res = {};
@@ -12,6 +17,7 @@ function minmaxsum(y) {
             res.min = v;
         }
         res.sum += v;
+        // console.log("res.sum: ", res.sum);
     });
     res.mean = res.sum / y.length;
     return res;
@@ -80,14 +86,20 @@ function characteristics(t, r) {
 
     if (r.length !== t.length) "r and t must have same length";
 
+    // convert to number
+    var t2 = [];
+    t.forEach(v => {t2.push(Number(v))});
+    var r2 = [];
+    r.forEach(v => {r2.push(Number(v))});
+
     var res = {};
 
     /** document input */
-    res.t = t;
-    res.r = r;
+    res.t = t2;
+    res.r = r2;
 
     /** basic descriptive statistics */
-    var mms = minmaxsum(r);
+    var mms = minmaxsum(r2);
     res.r_min = mms.min;
     res.r_max = mms.max;
     res.r_sum = mms.sum;
@@ -95,11 +107,11 @@ function characteristics(t, r) {
 
     /** lift into positive range */
     res.r_lift_min = [];
-    r.forEach(v => { res.r_lift_min.push(v - res.r_min) });
+    r2.forEach(v => { res.r_lift_min.push(v - res.r_min) });
 
     /** lift by mean */
     res.r_lift_avg = [];
-    r.forEach(v => { res.r_lift_avg.push(v - res.r_avg) });
+    r2.forEach(v => { res.r_lift_avg.push(v - res.r_avg) });
     res.sum_r_lifted_sq = 0;
     res.r_lift_avg.forEach(v => { res.sum_r_lifted_sq += v * v });
 
@@ -109,38 +121,47 @@ function characteristics(t, r) {
     res.f = [];
     res.r_lift_min.forEach(v => { res.f.push(v / sum_lifted); });
 
-    /** moments 0 .. 3 */
-    res.mon_0 = moment(t, res, 0);
-    res.mon_1 = moment(t, res, 1);
-    res.mon_2 = moment(t, res, 2);
-    res.mon_3 = moment(t, res, 3);
+    /** moments 0 .. 5 */
+    res.mon_0 = moment(t2, res, 0);
+    res.mon_1 = moment(t2, res, 1);
+    res.mon_2 = moment(t2, res, 2);
+    res.mon_3 = moment(t2, res, 3);
+    res.mon_4 = moment(t2, res, 4);
+    res.mon_5 = moment(t2, res, 5);
 
     /** above / below avg count */
     res.r_above_avg_cnt = 0;
     res.r_below_avg_cnt = 0;
-    res.r_lift_avg.forEach(v => {
+    res.r.forEach(v => {
         if (v >= res.r_avg) {
             res.r_above_avg_cnt++;
         } else {
             res.r_below_avg_cnt++;
         }
-    });
+   });
 
     /** most important autocorrelation peaks */
     var ac = [];
     ac.push(1.0);
-    for (var i = 1; i < r.length * 0.7; i++) {
+    for (var i = 1; i < r2.length * 0.7; i++) {
         ac.push(autocorrelation(res, i));
     }
     res.ac = ac;
-    var hlindex = indexOfNLargestSmallest(ac,3);
-    res.ac_top_1 = hlindex.highest[0];
-    res.ac_top_2 = hlindex.highest[1];
-    res.ac_low_1 = hlindex.lowest[0];
-    res.ac_low_2 = hlindex.lowest[1];
+    var hlindex = indexOfNLargestSmallest(ac,10);
+    for(var j = 1; j < 10; j++) {
+        var vn = "ac_top_" + j + "_idx";
+        res[vn] = hlindex.highest[j-1];
+        var vn = "ac_top_" + j + "_val";
+        res[vn] = ac[hlindex.highest[j-1]];
+        var vn = "ac_low_" + j + "_idx";
+        res[vn] = hlindex.lowest[j-1];
+        var vn = "ac_low_" + j + "_val";
+        res[vn] = ac[hlindex.lowest[j-1]];
+    }
+
     return res;
 }
 
 export {
-    minmaxsum, moment, autocorrelation, indexOfNLargestSmallest, characteristics
+    minmaxsum, moment, autocorrelation, indexOfNLargestSmallest, characteristics, version
 }
