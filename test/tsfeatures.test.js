@@ -77,3 +77,12 @@ test('linear trend', () => {
     }
     expect(res).toBe(true);
 });
+
+test('quantiles', () => {
+    console.log("linear trend");
+    var t = [1,2,3];
+    var r = [0,1,3];
+    var c = tsfeatures.characteristics(t, r);
+    console.log(c.lm1);
+    expect(c.r_q_1).toBe(0.19999999999999996 );
+});
