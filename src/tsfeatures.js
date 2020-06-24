@@ -1,6 +1,27 @@
+// const dl = require("datalib");
+import LM from 'ml-levenberg-marquardt';
+
 /** get version info*/
 function version() {
-    return "v0.0.3";
+    return "v0.0.4";
+}
+
+function polynomial_1([p0, p1]) {
+    return t => p0 + p1 * t;
+}
+function polynomial_2([p0, p1, p2]) {
+    return t => p0 + p1 * t + p2 * Math.pow(2);
+}
+function polynomial_3([p0, p1, p2, p3]) {
+    return t => p0 + p1 * t + p2 * Math.pow(2) + p3 * Math.pow(3);
+}
+function polynomial_4([p0, p1, p2, p3, p4]) {
+    return t => p0 + p1 * t + p2 * Math.pow(2) + p3 * Math.pow(3) + p4 * Math.pow(4);
+}
+
+function fit_polynomial(x, y, polynomial, options) {
+    var res = LM({ x: x, y: y }, polynomial, options);
+    return res;
 }
 
 /** get min, max, sum */
@@ -46,7 +67,7 @@ function autocorrelation(c, lag) {
 function indexOfNLargestSmallest(y, N) {
 
     if (N === undefined) N = 1;
-    var tmp = y.concat().sort((a,b)=>a-b);
+    var tmp = y.concat().sort((a, b) => a - b);
     // console.log("y  :", y);
     // console.log("tmp:", tmp);
     var res = {};
@@ -88,9 +109,9 @@ function characteristics(t, r) {
 
     // convert to number
     var t2 = [];
-    t.forEach(v => {t2.push(Number(v))});
+    t.forEach(v => { t2.push(Number(v)) });
     var r2 = [];
-    r.forEach(v => {r2.push(Number(v))});
+    r.forEach(v => { r2.push(Number(v)) });
 
     var res = {};
 
@@ -138,7 +159,7 @@ function characteristics(t, r) {
         } else {
             res.r_below_avg_cnt++;
         }
-   });
+    });
 
     /** most important autocorrelation peaks */
     var ac = [];
@@ -147,21 +168,37 @@ function characteristics(t, r) {
         ac.push(autocorrelation(res, i));
     }
     res.ac = ac;
-    var hlindex = indexOfNLargestSmallest(ac,10);
-    for(var j = 1; j < 10; j++) {
+    var hlindex = indexOfNLargestSmallest(ac, 10);
+    for (var j = 1; j < 10; j++) {
         var vn = "ac_top_" + j + "_idx";
-        res[vn] = hlindex.highest[j-1];
+        res[vn] = hlindex.highest[j - 1];
         var vn = "ac_top_" + j + "_val";
-        res[vn] = ac[hlindex.highest[j-1]];
+        res[vn] = ac[hlindex.highest[j - 1]];
         var vn = "ac_low_" + j + "_idx";
-        res[vn] = hlindex.lowest[j-1];
+        res[vn] = hlindex.lowest[j - 1];
         var vn = "ac_low_" + j + "_val";
-        res[vn] = ac[hlindex.lowest[j-1]];
+        res[vn] = ac[hlindex.lowest[j - 1]];
     }
+
+    /** add polynomials */
+    res.lm1 = fit_polynomial(t2, r2, polynomial_1, {
+        damping: 1.5,
+        initialValues: [1, 1]
+      });
+      res.lm2 = fit_polynomial(t2, r2, polynomial_2, {
+        damping: 1.5,
+        initialValues: [1, 1, 1]
+      });
+      res.lm3 = fit_polynomial(t2, r2, polynomial_3, {
+        damping: 1.5,
+        initialValues: [1, 1, 1, 1]
+      });
 
     return res;
 }
 
 export {
-    minmaxsum, moment, autocorrelation, indexOfNLargestSmallest, characteristics, version
+    minmaxsum, moment, autocorrelation, indexOfNLargestSmallest
+    , characteristics, version
+    , polynomial_1, polynomial_2, polynomial_3, polynomial_4, fit_polynomial
 }

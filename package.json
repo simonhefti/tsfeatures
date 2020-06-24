@@ -14,6 +14,12 @@
   "dependencies": {
     "babel": "^6.23.0",
     "babel-preset-env": "^1.7.0",
-    "jest": "^26.1.0"
+    "datalib": "^1.9.2",
+    "jest": "^26.1.0",
+    "ml-levenberg-marquardt": "^2.1.1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^13.0.0",
+    "@rollup/plugin-node-resolve": "^8.1.0"
   }
 }

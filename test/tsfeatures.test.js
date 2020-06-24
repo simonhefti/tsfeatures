@@ -56,3 +56,24 @@ test('deal with string input', () => {
     expect(c.r_above_avg_cnt).toBe(2);
     expect(c.r_below_avg_cnt).toBe(3);
 });
+
+test('linear trend', () => {
+    console.log("linear trend");
+    var tmp_t = [];
+    var tmp_v = [];
+    for (var i = 0; i < 5; i++) {
+        tmp_t.push(i);
+        tmp_v.push(tmp_t[i] * 10 - 3);
+    }
+    // var lm = ml.levenbergMarquardt({ x: tmp_t, y: tmp_v }, polynomial_1, {
+    //     damping: 1.5,
+    //     initialValues: [1, 1]
+    //   });
+    var c = tsfeatures.characteristics(tmp_t, tmp_v);
+    console.log(c.lm1);
+    var res = false;
+    if( c.lm1.parameterValues[0] > -3.1 & c.lm1.parameterValues[0] < -2.9) {
+        res = true;
+    }
+    expect(res).toBe(true);
+});
