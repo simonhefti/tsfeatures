@@ -1,4 +1,4 @@
-// const dl = require("datalib");
+const dl = require("datalib");
 import LM from 'ml-levenberg-marquardt';
 
 /** get version info*/
@@ -10,13 +10,13 @@ function polynomial_1([p0, p1]) {
     return t => p0 + p1 * t;
 }
 function polynomial_2([p0, p1, p2]) {
-    return t => p0 + p1 * t + p2 * Math.pow(t,2);
+    return t => p0 + p1 * t + p2 * Math.pow(t, 2);
 }
 function polynomial_3([p0, p1, p2, p3]) {
-    return t => p0 + p1 * t + p2 * Math.pow(t,2) + p3 * Math.pow(t,3);
+    return t => p0 + p1 * t + p2 * Math.pow(t, 2) + p3 * Math.pow(t, 3);
 }
 function polynomial_4([p0, p1, p2, p3, p4]) {
-    return t => p0 + p1 * t + p2 * Math.pow(t,2) + p3 * Math.pow(t,3) + p4 * Math.pow(t,4);
+    return t => p0 + p1 * t + p2 * Math.pow(t, 2) + p3 * Math.pow(t, 3) + p4 * Math.pow(t, 4);
 }
 
 function fit_polynomial(x, y, polynomial, options) {
@@ -184,15 +184,26 @@ function characteristics(t, r) {
     res.lm1 = fit_polynomial(t2, r2, polynomial_1, {
         damping: 1.5,
         initialValues: [1, 1]
-      });
-      res.lm2 = fit_polynomial(t2, r2, polynomial_2, {
+    });
+    res.lm2 = fit_polynomial(t2, r2, polynomial_2, {
         damping: 1.5,
         initialValues: [res.lm1.parameterValues[0], res.lm1.parameterValues[1], 1]
-      });
-      res.lm3 = fit_polynomial(t2, r2, polynomial_3, {
+    });
+    res.lm3 = fit_polynomial(t2, r2, polynomial_3, {
         damping: 1.5,
         initialValues: [1, 1, 1, 1]
-      });
+    });
+
+    /** add quantiles */
+    res.r_q_1 = dl.quantile(r2, 0.1);
+    res.r_q_2 = dl.quantile(r2, 0.2);
+    res.r_q_3 = dl.quantile(r2, 0.3);
+    res.r_q_4 = dl.quantile(r2, 0.4);
+    res.r_q_5 = dl.quantile(r2, 0.5);
+    res.r_q_6 = dl.quantile(r2, 0.6);
+    res.r_q_7 = dl.quantile(r2, 0.7);
+    res.r_q_8 = dl.quantile(r2, 0.8);
+    res.r_q_9 = dl.quantile(r2, 0.9);
 
     return res;
 }
