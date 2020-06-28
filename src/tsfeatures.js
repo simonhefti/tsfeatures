@@ -106,30 +106,30 @@ function autocorrelation(c, lag) {
     return res;
 }
 
-/** indices of n largest / smallest values in array */
-function indexOfNLargestSmallest(y, N) {
+// /** indices of n largest / smallest values in array */
+// function indexOfNLargestSmallest(y, N) {
 
-    if (N === undefined) N = 1;
-    var tmp = y.concat().sort((a, b) => a - b);
-    var res = {};
-    res.lowest = [];
-    var max = N;
-    if (max > y.length) {
-        max = y.length;
-    }
-    for (var i = 0; i < max; i++) {
-        res.lowest.push(y.indexOf(tmp[i]));
-    }
-    res.highest = [];
-    var min = y.length - N;
-    if (min < 0) {
-        min = 0;
-    }
-    for (var i = tmp.length - 1; i >= min; i--) {
-        res.highest.push(y.indexOf(tmp[i]));
-    }
-    return res;
-}
+//     if (N === undefined) N = 1;
+//     var tmp = y.concat().sort((a, b) => a - b);
+//     var res = {};
+//     res.lowest = [];
+//     var max = N;
+//     if (max > y.length) {
+//         max = y.length;
+//     }
+//     for (var i = 0; i < max; i++) {
+//         res.lowest.push(y.indexOf(tmp[i]));
+//     }
+//     res.highest = [];
+//     var min = y.length - N;
+//     if (min < 0) {
+//         min = 0;
+//     }
+//     for (var i = tmp.length - 1; i >= min; i--) {
+//         res.highest.push(y.indexOf(tmp[i]));
+//     }
+//     return res;
+// }
 
 // /** calculate derivative */
 // function derivative(t, r) {
@@ -235,51 +235,60 @@ function characteristics(t, r) {
         }
     });
 
-    /** most important autocorrelation peaks */
-    var ac = [];
-    var ac_t = [];
-    ac.push(1.0);
-    ac_t.push(res.t[0]);
+    /** autocorrelation */
+    res.ac = [];
+    res.ac_t = [];
+    res.ac.push(1.0);
+    res.ac_t.push(res.t[0]);
     for (var i = 1; i < res.r.length * 0.9; i++) {
-        ac.push(autocorrelation(res, i));
+        res.ac.push(autocorrelation(res, i));
+        res.ac_t.push(res.t[i]);
     }
-    res.ac = ac;
-    res.ac_mms = minmaxsum(res.ac);
-    // derivative of autocorrelation
-    res.ac_d = derivative(ac_t, ac);
-    res.ac_d_mms = minmaxsum(res.ac_d);
-    var ac_d_limit = res.ac_d_mms.max * 0.1;
-    var peaks = res.ac_d.filter(v => v > -ac_d_limit && v < ac_d_limit);
-    res.ac_p1_val = 0;
-    res.ac_p1_idx = 0;
-    res.ac_p2_val = 0;
-    res.ac_p2_idx = 0;
-    res.ac_p3_val = 0;
-    res.ac_p3_idx = 0;
-    res.ac_p4_val = 0;
-    res.ac_p4_idx = 0;
-    res.ac_p5_val = 0;
-    res.ac_p5_idx = 0;
-    if( peaks.length > 0) {
-        res.ac_p1_val = peaks[0];
-        res.ac_p1_idx = res.ad_d.indexOf(peaks[0]) + 1;
-    }
-    if( peaks.length > 1) {
-        res.ac_p2_val = peaks[1];
-        res.ac_p2_idx = res.ad_d.indexOf(peaks[1]) + 1;
-    }
-    if( peaks.length > 2) {
-        res.ac_p3_val = peaks[2];
-        res.ac_p3_idx = res.ad_d.indexOf(peaks[2]) + 1;
-    }
-    if( peaks.length > 3) {
-        res.ac_p4_val = peaks[3];
-        res.ac_p4_idx = res.ad_d.indexOf(peaks[3]) + 1;
-    }
-    if( peaks.length > 4) {
-        res.ac_p5_val = peaks[4];
-        res.ac_p5_idx = res.ad_d.indexOf(peaks[4]) + 1;
-    }
+
+    /** derivative of autocorrelation */
+    res.ac_roots = roots(res.ac_t, res.ac);
+
+    /** derivative of time series */
+    res.roots = roots(res.t, res.r);
+
+
+    // res.ac = ac;
+    // res.ac_mms = minmaxsum(res.ac);
+    // // derivative of autocorrelation
+    // res.ac_d = derivative(ac_t, ac);
+    // res.ac_d_mms = minmaxsum(res.ac_d);
+    // var ac_d_limit = res.ac_d_mms.max * 0.1;
+    // var peaks = res.ac_d.filter(v => v > -ac_d_limit && v < ac_d_limit);
+    // res.ac_p1_val = 0;
+    // res.ac_p1_idx = 0;
+    // res.ac_p2_val = 0;
+    // res.ac_p2_idx = 0;
+    // res.ac_p3_val = 0;
+    // res.ac_p3_idx = 0;
+    // res.ac_p4_val = 0;
+    // res.ac_p4_idx = 0;
+    // res.ac_p5_val = 0;
+    // res.ac_p5_idx = 0;
+    // if( peaks.length > 0) {
+    //     res.ac_p1_val = peaks[0];
+    //     res.ac_p1_idx = res.ad_d.indexOf(peaks[0]) + 1;
+    // }
+    // if( peaks.length > 1) {
+    //     res.ac_p2_val = peaks[1];
+    //     res.ac_p2_idx = res.ad_d.indexOf(peaks[1]) + 1;
+    // }
+    // if( peaks.length > 2) {
+    //     res.ac_p3_val = peaks[2];
+    //     res.ac_p3_idx = res.ad_d.indexOf(peaks[2]) + 1;
+    // }
+    // if( peaks.length > 3) {
+    //     res.ac_p4_val = peaks[3];
+    //     res.ac_p4_idx = res.ad_d.indexOf(peaks[3]) + 1;
+    // }
+    // if( peaks.length > 4) {
+    //     res.ac_p5_val = peaks[4];
+    //     res.ac_p5_idx = res.ad_d.indexOf(peaks[4]) + 1;
+    // }
 
     // var hlindex = indexOfNLargestSmallest(ac, 10);
     // for (var j = 1; j < 10; j++) {
