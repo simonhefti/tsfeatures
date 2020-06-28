@@ -56,6 +56,7 @@ function moment(t, c, moment) {
     return res;
 }
 
+/** calculate quantile q of given array y */
 function quantile(y, q) {
 
     var res = -1;
@@ -120,22 +121,86 @@ function derivative(t, r) {
 
     if (r.length !== t.length) throw "r and t must have same length";
 
+
     // convert to number
     var t2 = [];
     t.forEach(v => { t2.push(Number(v)) });
     var r2 = [];
     r.forEach(v => { r2.push(Number(v)) });
 
+    return _derivative(t2, r2);
+}
+
+/** calculate derivative (pre-check and number conversions already done) */
+function _derivative(t, r) {
+
     var res = [];
     res.push(0);
 
-    for (var i = 1; i < r2.length; i++) {
-        var dt = t2[i] - t2[i - 1];
-        var dr = r2[i] - r2[i - 1];
+    for (var i = 1; i < r.length; i++) {
+        var dt = t[i] - t[i - 1];
+        var dr = r[i] - r[i - 1];
         res.push(dr / dt);
     }
 
     return res;
+}
+
+/** get derivative and indicative roots (Nullstellen) */
+function roots(t,r) {
+
+    if (t === undefined) throw "t must be defined";
+    if (t === null) throw "t must be non-null";
+    if (t.length <= 0) throw "t.length must be > 0";
+
+    if (r === undefined) throw "r must be defined";
+    if (r === null) throw "r must be non-null";
+    if (r.length <= 0) throw "r.length must be > 0";
+
+    if (r.length !== t.length) throw "r and t must have same length";
+
+    // convert to number
+    var t2 = [];
+    t.forEach(v => { t2.push(Number(v)) });
+    var r2 = [];
+    r.forEach(v => { r2.push(Number(v)) });
+
+
+    var d = derivative(t, r);
+    res.ac_d_mms = minmaxsum(res.ac_d);
+    var ac_d_limit = res.ac_d_mms.max * 0.1;
+    var peaks = res.ac_d.filter(v => v > -ac_d_limit && v < ac_d_limit);
+    res.ac_p1_val = 0;
+    res.ac_p1_idx = 0;
+    res.ac_p2_val = 0;
+    res.ac_p2_idx = 0;
+    res.ac_p3_val = 0;
+    res.ac_p3_idx = 0;
+    res.ac_p4_val = 0;
+    res.ac_p4_idx = 0;
+    res.ac_p5_val = 0;
+    res.ac_p5_idx = 0;
+    if( peaks.length > 0) {
+        res.ac_p1_val = peaks[0];
+        res.ac_p1_idx = res.ad_d.indexOf(peaks[0]) + 1;
+    }
+    if( peaks.length > 1) {
+        res.ac_p2_val = peaks[1];
+        res.ac_p2_idx = res.ad_d.indexOf(peaks[1]) + 1;
+    }
+    if( peaks.length > 2) {
+        res.ac_p3_val = peaks[2];
+        res.ac_p3_idx = res.ad_d.indexOf(peaks[2]) + 1;
+    }
+    if( peaks.length > 3) {
+        res.ac_p4_val = peaks[3];
+        res.ac_p4_idx = res.ad_d.indexOf(peaks[3]) + 1;
+    }
+    if( peaks.length > 4) {
+        res.ac_p5_val = peaks[4];
+        res.ac_p5_idx = res.ad_d.indexOf(peaks[4]) + 1;
+    }
+    
 }
 
 /** get base notions from time series (time t and observation r) */
@@ -207,22 +272,61 @@ function characteristics(t, r) {
 
     /** most important autocorrelation peaks */
     var ac = [];
+    var ac_t = [];
     ac.push(1.0);
-    for (var i = 1; i < r2.length * 0.7; i++) {
+    ac_t.push(t2[0]);
+    for (var i = 1; i < r2.length * 0.9; i++) {
         ac.push(autocorrelation(res, i));
     }
     res.ac = ac;
-    var hlindex = indexOfNLargestSmallest(ac, 10);
-    for (var j = 1; j < 10; j++) {
-        var vn = "ac_top_" + j + "_idx";
-        res[vn] = hlindex.highest[j - 1];
-        var vn = "ac_top_" + j + "_val";
-        res[vn] = ac[hlindex.highest[j - 1]];
-        var vn = "ac_low_" + j + "_idx";
-        res[vn] = hlindex.lowest[j - 1];
-        var vn = "ac_low_" + j + "_val";
-        res[vn] = ac[hlindex.lowest[j - 1]];
+    res.ac_mms = minmaxsum(res.ac);
+    // derivative of autocorrelation
+    res.ac_d = derivative(ac_t, ac);
+    res.ac_d_mms = minmaxsum(res.ac_d);
+    var ac_d_limit = res.ac_d_mms.max * 0.1;
+    var peaks = res.ac_d.filter(v => v > -ac_d_limit && v < ac_d_limit);
+    res.ac_p1_val = 0;
+    res.ac_p1_idx = 0;
+    res.ac_p2_val = 0;
+    res.ac_p2_idx = 0;
+    res.ac_p3_val = 0;
+    res.ac_p3_idx = 0;
+    res.ac_p4_val = 0;
+    res.ac_p4_idx = 0;
+    res.ac_p5_val = 0;
+    res.ac_p5_idx = 0;
+    if( peaks.length > 0) {
+        res.ac_p1_val = peaks[0];
+        res.ac_p1_idx = res.ad_d.indexOf(peaks[0]) + 1;
     }
+    if( peaks.length > 1) {
+        res.ac_p2_val = peaks[1];
+        res.ac_p2_idx = res.ad_d.indexOf(peaks[1]) + 1;
+    }
+    if( peaks.length > 2) {
+        res.ac_p3_val = peaks[2];
+        res.ac_p3_idx = res.ad_d.indexOf(peaks[2]) + 1;
+    }
+    if( peaks.length > 3) {
+        res.ac_p4_val = peaks[3];
+        res.ac_p4_idx = res.ad_d.indexOf(peaks[3]) + 1;
+    }
+    if( peaks.length > 4) {
+        res.ac_p5_val = peaks[4];
+        res.ac_p5_idx = res.ad_d.indexOf(peaks[4]) + 1;
+    }
+
+    // var hlindex = indexOfNLargestSmallest(ac, 10);
+    // for (var j = 1; j < 10; j++) {
+    //     var vn = "ac_top_" + j + "_idx";
+    //     res[vn] = hlindex.highest[j - 1];
+    //     var vn = "ac_top_" + j + "_val";
+    //     res[vn] = ac[hlindex.highest[j - 1]];
+    //     var vn = "ac_low_" + j + "_idx";
+    //     res[vn] = hlindex.lowest[j - 1];
+    //     var vn = "ac_low_" + j + "_val";
+    //     res[vn] = ac[hlindex.lowest[j - 1]];
+    // }
 
     /** add polynomials */
     res.lm1 = fit_polynomial(t2, r2, polynomial_1, {
