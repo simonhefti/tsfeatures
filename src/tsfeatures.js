@@ -1,42 +1,10 @@
-// const dl = require("datalib");
-// import * as dl from 'datalib';
-// import {quantile} from "datalib";
 import LM from 'ml-levenberg-marquardt';
-
-// const FFT = require('fft-js');
 
 /** get version info*/
 function version() {
-    return "v0.0.8";
+    return "v0.0.9";
 }
 
-// /** get FFT frequency profile for measures rates (assuming equidistance) */
-// function frequencies(r) {
-//     if (r === undefined) throw "r must be defined";
-//     if (r === null) throw "r must be non-null";
-//     if (r.length <= 0) throw "r.length must be > 0";
-//     var res = {};
-//     res.f = [];
-//     res.m = [];
-
-//     var r2 = [];
-//     r.forEach(v => { r2.push(Number(v)) });
-//     // console.log(r2);
-//     // console.log(FFT);
-//     try {
-//         var phasors = FFT.fft(r2);
-//         // console.log(phasors);
-//         // Sample rate and coef is just used for length, and frequency step
-//         var frequencies = FFT.util.fftFreq(phasors, 8000);
-//         var magnitudes = FFT.util.fftMag(phasors);
-//         res.f = frequencies;
-//         res.m = magnitudes;
-//     } catch {
-//         console.log("FFT fails");
-//     }
-
-//     return res;
-// }
 
 function polynomial_1([p0, p1]) {
     return t => p0 + p1 * t;
@@ -119,12 +87,9 @@ function indexOfNLargestSmallest(y, N) {
 
     if (N === undefined) N = 1;
     var tmp = y.concat().sort((a, b) => a - b);
-    // console.log("y  :", y);
-    // console.log("tmp:", tmp);
     var res = {};
     res.lowest = [];
     var max = N;
-    // console.log("max:", max);
     if (max > y.length) {
         max = y.length;
     }
@@ -136,7 +101,6 @@ function indexOfNLargestSmallest(y, N) {
     if (min < 0) {
         min = 0;
     }
-    // console.log("min:", min);
     for (var i = tmp.length - 1; i >= min; i--) {
         res.highest.push(y.indexOf(tmp[i]));
     }
@@ -168,15 +132,11 @@ function derivative(t, r) {
     for (var i = 1; i < r2.length; i++) {
         var dt = t2[i] - t2[i - 1];
         var dr = r2[i] - r2[i - 1];
-        // console.log(dt,dr);
         res.push(dr / dt);
     }
 
     return res;
 }
-
-// function check_valid_input(t) {
-// }
 
 /** get base notions from time series (time t and observation r) */
 function characteristics(t, r) {
@@ -277,43 +237,11 @@ function characteristics(t, r) {
         damping: 1.5,
         initialValues: [1, 1, 1, 1]
     });
-    // res.lm4 = fit_polynomial(t2, r2, polynomial_4, {
-    //     damping: 1.5,
-    //     initialValues: [1, 1, 1, 1, 1]
-    // });
 
     /** add quantiles */
     res.r_q_1 = quantile(r2, 0.25);
     res.r_q_2 = quantile(r2, 0.50);
     res.r_q_3 = quantile(r2, 0.75);
-    // res.r_q_4 = dl.quantile(r2, 0.4);
-    // res.r_q_5 = dl.quantile(r2, 0.5);
-    // res.r_q_6 = dl.quantile(r2, 0.6);
-    // res.r_q_7 = dl.quantile(r2, 0.7);
-    // res.r_q_8 = dl.quantile(r2, 0.8);
-    // res.r_q_9 = dl.quantile(r2, 0.9);
-
-    // /** add FFT */
-    // var fft = frequencies(r2);
-    // res.fft_N = fft.f.length;
-    // res.fft_1_f = -1;
-    // res.fft_1_m = -1;
-    // if (fft.f.length > 0) {
-    //     res.fft_1_f = fft.f[0];
-    //     res.fft_1_m = fft.m[0]
-    // }
-    // res.fft_2_f = -1;
-    // res.fft_2_m = -1;
-    // if (fft.f.length > 1) {
-    //     res.fft_2_f = fft.f[1];
-    //     res.fft_2_m = fft.m[1]
-    // }
-    // res.fft_3_f = -1;
-    // res.fft_3_m = -1;
-    // if (fft.f.length > 2) {
-    //     res.fft_3_f = fft.f[2];
-    //     res.fft_3_m = fft.m[2]
-    // }
 
     return res;
 }
