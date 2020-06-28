@@ -1,4 +1,6 @@
-const dl = require("datalib");
+// const dl = require("datalib");
+import * as dl from 'datalib';
+// import {quantile} from "datalib";
 import LM from 'ml-levenberg-marquardt';
 
 // const FFT = require('fft-js');
