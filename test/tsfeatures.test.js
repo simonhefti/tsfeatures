@@ -86,6 +86,15 @@ test('quantiles', () => {
     expect(c.r_q_1).toBe(0.5);
 });
 
+test('quantiles 2', () => {
+    var r = [7, 20, 16, 6, 58, 9, 20, 50, 23, 33, 8, 10, 15, 16, 104];
+    expect(tsfeatures.quantile(r,0)).toBe(6.0);
+    expect(tsfeatures.quantile(r,0.25)).toBe(9.5);
+    expect(tsfeatures.quantile(r,0.50)).toBe(16.0);
+    expect(tsfeatures.quantile(r,0.75)).toBe(28.0);
+    expect(tsfeatures.quantile(r,1.0)).toBe(104.0);
+});
+
 test('derivative', () => {
     var t = [1,2,3];
     var r = [0,1,2];

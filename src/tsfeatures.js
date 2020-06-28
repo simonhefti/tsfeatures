@@ -1,5 +1,5 @@
 // const dl = require("datalib");
-import * as dl from 'datalib';
+// import * as dl from 'datalib';
 // import {quantile} from "datalib";
 import LM from 'ml-levenberg-marquardt';
 
@@ -87,6 +87,22 @@ function moment(t, c, moment) {
     });
     return res;
 }
+
+function quantile(y, q) {
+
+    var res = -1;
+
+    var sorted = y.concat().sort((a, b) => a - b);
+    var pos = (sorted.length - 1) * q;
+    var base = Math.floor(pos);
+    var rest = pos - base;
+    if (sorted[base + 1] !== undefined) {
+        res = sorted[base] + rest * (sorted[base + 1] - sorted[base]);
+    } else {
+        res = sorted[base];
+    }
+    return res;
+};
 
 /** calculate autocorrelation for lag */
 function autocorrelation(c, lag) {
@@ -267,9 +283,9 @@ function characteristics(t, r) {
     // });
 
     /** add quantiles */
-    res.r_q_1 = dl.quantile(r2, 0.25);
-    res.r_q_2 = dl.quantile(r2, 0.50);
-    res.r_q_3 = dl.quantile(r2, 0.75);
+    res.r_q_1 = quantile(r2, 0.25);
+    res.r_q_2 = quantile(r2, 0.50);
+    res.r_q_3 = quantile(r2, 0.75);
     // res.r_q_4 = dl.quantile(r2, 0.4);
     // res.r_q_5 = dl.quantile(r2, 0.5);
     // res.r_q_6 = dl.quantile(r2, 0.6);
@@ -307,5 +323,6 @@ export {
     , characteristics, version
     , polynomial_1, polynomial_2, polynomial_3, polynomial_4, fit_polynomial
     , polynomial_5, derivative
+    , quantile
     // , frequencies
 }
