@@ -228,7 +228,7 @@ function characteristics(t, r) {
     res.r_above_avg_cnt = 0;
     res.r_below_avg_cnt = 0;
     res.r.forEach(v => {
-        if (v >= res.r_avg) {
+        if (v >= res.r_mms.avg) {
             res.r_above_avg_cnt++;
         } else {
             res.r_below_avg_cnt++;
@@ -315,20 +315,20 @@ function characteristics(t, r) {
     /** binning */
     // console.log("r2", r2);
     // console.log("min", res.r_min, "max", res.r_max);
-    var lb = res.r_min;
-    var hb = res.r_min + (res.r_max - res.r_min) * 0.25;
+    var lb = res.r_mms.min;
+    var hb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 0.25;
     res.r_bin_1 = res.r.filter(v => v >= lb && v < hb).length; //count of values in first 25%
     // console.log("lb", lb, "hb", hb, "v", r2.filter(v => v >= lb && v < hb), "res", res.r_bin_1);
-    lb = res.r_min + (res.r_max - res.r_min) * 0.25;
-    hb = res.r_min + (res.r_max - res.r_min) * 0.50;
+    lb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 0.25;
+    hb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 0.50;
     res.r_bin_2 = res.r.filter(v => v >= lb && v < hb).length;
     // console.log("lb", lb, "hb", hb, "v", r2.filter(v => v >= lb && v < hb), "res", res.r_bin_2);
-    lb = res.r_min + (res.r_max - res.r_min) * 0.50;
-    hb = res.r_min + (res.r_max - res.r_min) * 0.75;
+    lb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 0.50;
+    hb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 0.75;
     res.r_bin_3 = res.r.filter(v => v >= lb && v < hb).length;
     // console.log("lb", lb, "hb", hb, "v", r2.filter(v => v >= lb && v < hb), "res", res.r_bin_3);
-    lb = res.r_min + (res.r_max - res.r_min) * 0.75;
-    hb = res.r_min + (res.r_max - res.r_min) * 1.0;
+    lb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 0.75;
+    hb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 1.0;
     res.r_bin_4 = res.r.filter(v => v >= lb && v <= hb).length;
     // console.log("lb", lb, "hb", hb, "v", r2.filter(v => v >= lb && v <= hb), "res", res.r_bin_4);
 
