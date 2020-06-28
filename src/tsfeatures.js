@@ -243,6 +243,26 @@ function characteristics(t, r) {
     res.r_q_2 = quantile(r2, 0.50);
     res.r_q_3 = quantile(r2, 0.75);
 
+    /** binning */
+    // console.log("r2", r2);
+    // console.log("min", res.r_min, "max", res.r_max);
+    var lb = res.r_min;
+    var hb = res.r_min + (res.r_max - res.r_min) * 0.25;
+    res.r_bin_1 = r2.filter(v => v >= lb && v < hb).length; //count of values in first 25%
+    // console.log("lb", lb, "hb", hb, "v", r2.filter(v => v >= lb && v < hb), "res", res.r_bin_1);
+    lb = res.r_min + (res.r_max - res.r_min) * 0.25;
+    hb = res.r_min + (res.r_max - res.r_min) * 0.50;
+    res.r_bin_2 = r2.filter(v => v >= lb && v < hb).length;
+    // console.log("lb", lb, "hb", hb, "v", r2.filter(v => v >= lb && v < hb), "res", res.r_bin_2);
+    lb = res.r_min + (res.r_max - res.r_min) * 0.50;
+    hb = res.r_min + (res.r_max - res.r_min) * 0.75;
+    res.r_bin_3 = r2.filter(v => v >= lb && v < hb).length;
+    // console.log("lb", lb, "hb", hb, "v", r2.filter(v => v >= lb && v < hb), "res", res.r_bin_3);
+    lb = res.r_min + (res.r_max - res.r_min) * 0.75;
+    hb = res.r_min + (res.r_max - res.r_min) * 1.0;
+    res.r_bin_4 = r2.filter(v => v >= lb && v <= hb).length;
+    // console.log("lb", lb, "hb", hb, "v", r2.filter(v => v >= lb && v <= hb), "res", res.r_bin_4);
+
     return res;
 }
 

@@ -104,6 +104,14 @@ test('derivative', () => {
     expect(d[2]).toBe(1);
 });
 
+test('binning', () => {
+    var t = [0,1,2,3,4,5,6,7];
+    var r = [0,1,2,3,4,5,6,7];
+    var c = tsfeatures.characteristics(t,r);
+    expect(c.r_bin_1).toBe(2);
+    expect(c.r_bin_4).toBe(2);
+});
+
 // test('fft', () => {
 //     var res = tsfeatures.frequencies([0,1,0,1]);
 //     // console.log(res);
