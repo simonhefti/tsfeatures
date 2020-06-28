@@ -66,7 +66,7 @@ function minmaxsum(y) {
         res.sum += v;
         // console.log("res.sum: ", res.sum);
     });
-    res.mean = res.sum / y.length;
+    res.avg = res.sum / y.length;
     return res;
 }
 
@@ -194,18 +194,19 @@ function characteristics(t, r) {
 
     /** basic descriptive statistics */
     var mms = minmaxsum(res.r);
-    res.r_min = mms.min;
-    res.r_max = mms.max;
-    res.r_sum = mms.sum;
-    res.r_avg = mms.mean;
+    res.r_mms = mms;
+    // res.r_min = mms.min;
+    // res.r_max = mms.max;
+    // res.r_sum = mms.sum;
+    // res.r_avg = mms.mean;
 
     /** lift into positive range */
     res.r_lift_min = [];
-    res.r.forEach(v => { res.r_lift_min.push(v - res.r_min) });
+    res.r.forEach(v => { res.r_lift_min.push(v - res.r_mms.min) });
 
     /** lift by mean */
     res.r_lift_avg = [];
-    res.r.forEach(v => { res.r_lift_avg.push(v - res.r_avg) });
+    res.r.forEach(v => { res.r_lift_avg.push(v - res.r_mms.avg) });
     res.sum_r_lifted_sq = 0;
     res.r_lift_avg.forEach(v => { res.sum_r_lifted_sq += v * v });
 
@@ -335,8 +336,12 @@ function characteristics(t, r) {
 }
 
 export {
-    minmaxsum, moment, autocorrelation, indexOfNLargestSmallest
-    , characteristics, version
+    version
+    , minmaxsum
+    , moment
+    , autocorrelation
+    // , indexOfNLargestSmallest
+    , characteristics
     , polynomial_1, polynomial_2, polynomial_3, polynomial_4, polynomial_5
     , fit_polynomial
     , derivative
