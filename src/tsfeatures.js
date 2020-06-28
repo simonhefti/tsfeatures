@@ -1,10 +1,40 @@
 const dl = require("datalib");
 import LM from 'ml-levenberg-marquardt';
 
+// const FFT = require('fft-js');
+
 /** get version info*/
 function version() {
-    return "v0.0.5";
+    return "v0.0.8";
 }
+
+// /** get FFT frequency profile for measures rates (assuming equidistance) */
+// function frequencies(r) {
+//     if (r === undefined) throw "r must be defined";
+//     if (r === null) throw "r must be non-null";
+//     if (r.length <= 0) throw "r.length must be > 0";
+//     var res = {};
+//     res.f = [];
+//     res.m = [];
+
+//     var r2 = [];
+//     r.forEach(v => { r2.push(Number(v)) });
+//     // console.log(r2);
+//     // console.log(FFT);
+//     try {
+//         var phasors = FFT.fft(r2);
+//         // console.log(phasors);
+//         // Sample rate and coef is just used for length, and frequency step
+//         var frequencies = FFT.util.fftFreq(phasors, 8000);
+//         var magnitudes = FFT.util.fftMag(phasors);
+//         res.f = frequencies;
+//         res.m = magnitudes;
+//     } catch {
+//         console.log("FFT fails");
+//     }
+
+//     return res;
+// }
 
 function polynomial_1([p0, p1]) {
     return t => p0 + p1 * t;
@@ -17,6 +47,9 @@ function polynomial_3([p0, p1, p2, p3]) {
 }
 function polynomial_4([p0, p1, p2, p3, p4]) {
     return t => p0 + p1 * t + p2 * Math.pow(t, 2) + p3 * Math.pow(t, 3) + p4 * Math.pow(t, 4);
+}
+function polynomial_5([p0, p1, p2, p3, p4, p5]) {
+    return t => p0 + p1 * t + p2 * Math.pow(t, 2) + p3 * Math.pow(t, 3) + p4 * Math.pow(t, 4) + p5 * Math.pow(t, 5);
 }
 
 function fit_polynomial(x, y, polynomial, options) {
@@ -92,20 +125,53 @@ function indexOfNLargestSmallest(y, N) {
     return res;
 }
 
+/** calculate derivative */
+function derivative(t, r) {
 
+    if (t === undefined) throw "t must be defined";
+    if (t === null) throw "t must be non-null";
+    if (t.length <= 0) throw "t.length must be > 0";
+
+    if (r === undefined) throw "r must be defined";
+    if (r === null) throw "r must be non-null";
+    if (r.length <= 0) throw "r.length must be > 0";
+
+    if (r.length !== t.length) throw "r and t must have same length";
+
+    // convert to number
+    var t2 = [];
+    t.forEach(v => { t2.push(Number(v)) });
+    var r2 = [];
+    r.forEach(v => { r2.push(Number(v)) });
+
+    var res = [];
+    res.push(0);
+
+    for (var i = 1; i < r2.length; i++) {
+        var dt = t2[i] - t2[i - 1];
+        var dr = r2[i] - r2[i - 1];
+        // console.log(dt,dr);
+        res.push(dr / dt);
+    }
+
+    return res;
+}
+
+// function check_valid_input(t) {
+// }
 
 /** get base notions from time series (time t and observation r) */
 function characteristics(t, r) {
 
     if (t === undefined) throw "t must be defined";
-    if (t === null) "t must be non-null";
-    if (t.length <= 0) "t.length must be > 0";
+    if (t === null) throw "t must be non-null";
+    if (t.length <= 0) throw "t.length must be > 0";
 
     if (r === undefined) throw "r must be defined";
-    if (r === null) "r must be non-null";
-    if (r.length <= 0) "r.length must be > 0";
+    if (r === null) throw "r must be non-null";
+    if (r.length <= 0) throw "r.length must be > 0";
 
-    if (r.length !== t.length) "r and t must have same length";
+    if (r.length !== t.length) throw "r and t must have same length";
 
     // convert to number
     var t2 = [];
@@ -193,17 +259,43 @@ function characteristics(t, r) {
         damping: 1.5,
         initialValues: [1, 1, 1, 1]
     });
+    // res.lm4 = fit_polynomial(t2, r2, polynomial_4, {
+    //     damping: 1.5,
+    //     initialValues: [1, 1, 1, 1, 1]
+    // });
 
     /** add quantiles */
-    res.r_q_1 = dl.quantile(r2, 0.1);
-    res.r_q_2 = dl.quantile(r2, 0.2);
-    res.r_q_3 = dl.quantile(r2, 0.3);
-    res.r_q_4 = dl.quantile(r2, 0.4);
-    res.r_q_5 = dl.quantile(r2, 0.5);
-    res.r_q_6 = dl.quantile(r2, 0.6);
-    res.r_q_7 = dl.quantile(r2, 0.7);
-    res.r_q_8 = dl.quantile(r2, 0.8);
-    res.r_q_9 = dl.quantile(r2, 0.9);
+    res.r_q_1 = dl.quantile(r2, 0.25);
+    res.r_q_2 = dl.quantile(r2, 0.50);
+    res.r_q_3 = dl.quantile(r2, 0.75);
+    // res.r_q_4 = dl.quantile(r2, 0.4);
+    // res.r_q_5 = dl.quantile(r2, 0.5);
+    // res.r_q_6 = dl.quantile(r2, 0.6);
+    // res.r_q_7 = dl.quantile(r2, 0.7);
+    // res.r_q_8 = dl.quantile(r2, 0.8);
+    // res.r_q_9 = dl.quantile(r2, 0.9);
+
+    // /** add FFT */
+    // var fft = frequencies(r2);
+    // res.fft_N = fft.f.length;
+    // res.fft_1_f = -1;
+    // res.fft_1_m = -1;
+    // if (fft.f.length > 0) {
+    //     res.fft_1_f = fft.f[0];
+    //     res.fft_1_m = fft.m[0]
+    // }
+    // res.fft_2_f = -1;
+    // res.fft_2_m = -1;
+    // if (fft.f.length > 1) {
+    //     res.fft_2_f = fft.f[1];
+    //     res.fft_2_m = fft.m[1]
+    // }
+    // res.fft_3_f = -1;
+    // res.fft_3_m = -1;
+    // if (fft.f.length > 2) {
+    //     res.fft_3_f = fft.f[2];
+    //     res.fft_3_m = fft.m[2]
+    // }
 
     return res;
 }
@@ -212,4 +304,6 @@ export {
     minmaxsum, moment, autocorrelation, indexOfNLargestSmallest
     , characteristics, version
     , polynomial_1, polynomial_2, polynomial_3, polynomial_4, fit_polynomial
+    , polynomial_5, derivative
+    // , frequencies
 }

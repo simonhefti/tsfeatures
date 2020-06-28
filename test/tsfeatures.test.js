@@ -3,7 +3,7 @@ const tsfeatures = require('../src/tsfeatures');
 test('indexOfNLargestSmallest', () => {
     var tst = [7, 1, 2, 9, 3];
     var res = tsfeatures.indexOfNLargestSmallest(tst);
-    console.log(res);
+    // console.log(res);
     expect(res.highest[0]).toBe(3);
     expect(res.lowest[0]).toBe(1);
 });
@@ -12,7 +12,7 @@ test('characteristics', () => {
     var t = [1, 2, 3, 4, 5];
     var r = [0, 10, 5, 0, 0];
     var c = tsfeatures.characteristics(t, r);
-    console.log(c);
+    // console.log(c);
     expect(c.r_min).toBe(0);
     expect(c.r_max).toBe(10);
     expect(c.r_sum).toBe(15);
@@ -34,7 +34,7 @@ test('characteristics 2', () => {
     var r = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 3, 4, 0, 5, 2, 5, 4, 2, 4, 5, 8, 6, 6, 3, 1, 4, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
     var c = tsfeatures.characteristics(t, r);
-    console.log(c);
+    // console.log(c);
 
     expect(c.r_sum).toBe(68);
     expect(c.ac_low_4_idx).toBe(18);
@@ -44,7 +44,7 @@ test('deal with string input', () => {
     var t = [1, 2, 3, 4, 5];
     var r = ["0", "10", "5", "0", "0"];
     var c = tsfeatures.characteristics(t, r);
-    console.log(c);
+    // console.log(c);
     expect(c.r_min).toBe(0);
     expect(c.r_max).toBe(10);
     expect(c.r_sum).toBe(15);
@@ -79,10 +79,37 @@ test('linear trend', () => {
 });
 
 test('quantiles', () => {
-    console.log("linear trend");
     var t = [1,2,3];
     var r = [0,1,3];
     var c = tsfeatures.characteristics(t, r);
-    console.log(c.lm1);
-    expect(c.r_q_1).toBe(0.19999999999999996 );
+    // console.log(c.lm1);
+    expect(c.r_q_1).toBe(0.5);
 });
+
+test('derivative', () => {
+    var t = [1,2,3];
+    var r = [0,1,2];
+    var d = tsfeatures.derivative(t, r);
+    expect(d[0]).toBe(0);
+    expect(d[1]).toBe(1);
+    expect(d[2]).toBe(1);
+});
+
+// test('fft', () => {
+//     var res = tsfeatures.frequencies([0,1,0,1]);
+//     // console.log(res);
+//     expect(res.f.length > 0).toBe(true);
+// });
+
+// test('fft2', () => {
+//     var res = tsfeatures.frequencies([0,1,3]);
+//     expect(res.f.length > 0).toBe(false);
+//     var r = [];
+//     for(var i = 0; i < 100; i++) {
+//         r.push(Math.sin(i * 3));
+//     }
+//     // res = tsfeatures.frequencies([0,1,3,1,0,1,3]);
+//     res = tsfeatures.frequencies(r);
+//     // expect(res.f.length > 0).toBe(false);
+//     console.log("sin: ", res);
+// });
