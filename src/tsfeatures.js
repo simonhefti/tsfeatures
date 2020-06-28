@@ -2,7 +2,7 @@ import LM from 'ml-levenberg-marquardt';
 
 /** get version info*/
 function version() {
-    return "v0.0.9";
+    return "v0.1.0";
 }
 
 
