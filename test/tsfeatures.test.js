@@ -122,12 +122,11 @@ test('roots', () => {
     var d = tsfeatures.roots(t,r);
     console.log(d);
     expect(d.peak_vals.length > 0).toBe(true);
+    expect(d.peak_vals.length === 3).toBe(true);
     expect(d.peak_vals[0]).toBe(0);
     expect(d.peak_idxs[0]).toBe(0);
-    expect(d.peak_idxs[1]).toBe(16);
-    expect(d.peak_idxs[2]).toBe(17);
-    expect(d.peak_idxs[3]).toBe(47);
-    expect(d.peak_idxs[4]).toBe(48);
+    expect(d.peak_idxs[1]).toBe(17);
+    expect(d.peak_idxs[2]).toBe(48);
 });
 
 // test('fft', () => {
