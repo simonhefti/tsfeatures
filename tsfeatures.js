@@ -3985,7 +3985,7 @@ ${indent}columns: ${matrix.columns}
 
   /** get version info*/
   function version() {
-      return "v0.1.1";
+      return "v0.1.2";
   }
 
   function polynomial_1([p0, p1]) {
@@ -4009,6 +4009,7 @@ ${indent}columns: ${matrix.columns}
       return res;
   }
 
+  /** check correct array sizes and convert to number or throw error */
   function checkconv(t, r) {
 
       if (t === undefined) throw "t must be defined";
@@ -4033,7 +4034,7 @@ ${indent}columns: ${matrix.columns}
   }
 
 
-  /** get min, max, sum */
+  /** get min, max, sum, avg */
   function minmaxsum(y) {
       var res = {};
       res.max = Number.MIN_VALUE;
@@ -4088,53 +4089,6 @@ ${indent}columns: ${matrix.columns}
       return res;
   }
 
-  // /** indices of n largest / smallest values in array */
-  // function indexOfNLargestSmallest(y, N) {
-
-  //     if (N === undefined) N = 1;
-  //     var tmp = y.concat().sort((a, b) => a - b);
-  //     var res = {};
-  //     res.lowest = [];
-  //     var max = N;
-  //     if (max > y.length) {
-  //         max = y.length;
-  //     }
-  //     for (var i = 0; i < max; i++) {
-  //         res.lowest.push(y.indexOf(tmp[i]));
-  //     }
-  //     res.highest = [];
-  //     var min = y.length - N;
-  //     if (min < 0) {
-  //         min = 0;
-  //     }
-  //     for (var i = tmp.length - 1; i >= min; i--) {
-  //         res.highest.push(y.indexOf(tmp[i]));
-  //     }
-  //     return res;
-  // }
-
-  // /** calculate derivative */
-  // function derivative(t, r) {
-
-  //     if (t === undefined) throw "t must be defined";
-  //     if (t === null) throw "t must be non-null";
-  //     if (t.length <= 0) throw "t.length must be > 0";
-
-  //     if (r === undefined) throw "r must be defined";
-  //     if (r === null) throw "r must be non-null";
-  //     if (r.length <= 0) throw "r.length must be > 0";
-
-  //     if (r.length !== t.length) throw "r and t must have same length";
-
-  //     // convert to number
-  //     var t2 = [];
-  //     t.forEach(v => { t2.push(Number(v)) });
-  //     var r2 = [];
-  //     r.forEach(v => { r2.push(Number(v)) });
-
-  //     return _derivative(t2, r2);
-  // }
-
   /** calculate derivative (pre-check and conversion to numbers already done) */
   function derivative(t, r) {
 
@@ -4152,20 +4106,49 @@ ${indent}columns: ${matrix.columns}
 
   /** get derivative and indicative roots (Nullstellen) (pre-check and conversion to numbers already done) */
   function roots(t,r) {
+      // get first derivative
       var d = derivative(t, r);
+      // min, max, ...
       var d_mms = minmaxsum(d);
+      // find roots (values)
       var d_limit = d_mms.max * 0.1;
       var peaks = d.filter(v => v > -d_limit && v < d_limit);
+      // from root values to root indices
       var locs = [];
       peaks.forEach(v => {
           locs.push(d.indexOf(v));
       });
+      // check for multiple consecutive entries
+      var groups = [];
+      var group = [];
+      if( locs.length > 0) {
+          group.push(locs[0]);
+          for( var i = 1; i < locs.length; i++) {
+              if( locs[i] - locs[i-1] === 1) {
+                  group.push(locs[i]);
+              } else {
+                  groups.push(group);
+                  group = [];
+                  group.push(locs[i]);
+              }
+          }
+      }
+      // get value for center of each group
+      var peak_vals = [];
+      var peak_idxs = [];
+      groups.forEach(group => {
+          var idx = Math.floor(group.length / 2 + group[0]);
+          peak_idxs.push(idx);
+          peak_vals.push(r[idx]);
+      });
+
       var res = {};
       res.d = d;
       res.d_mms = d_mms;
       res.d_limit = d_limit;
-      res.peak_vals = peaks;
-      res.peak_idxs = locs;
+      res.peak_vals = peak_vals;
+      res.peak_idxs = peak_idxs;
+      res.groups = groups;
       return res;
   }
 
@@ -4177,10 +4160,6 @@ ${indent}columns: ${matrix.columns}
       /** basic descriptive statistics */
       var mms = minmaxsum(res.r);
       res.r_mms = mms;
-      // res.r_min = mms.min;
-      // res.r_max = mms.max;
-      // res.r_sum = mms.sum;
-      // res.r_avg = mms.mean;
 
       /** lift into positive range */
       res.r_lift_min = [];
@@ -4232,57 +4211,6 @@ ${indent}columns: ${matrix.columns}
 
       /** derivative of time series */
       res.roots = roots(res.t, res.r);
-
-
-      // res.ac = ac;
-      // res.ac_mms = minmaxsum(res.ac);
-      // // derivative of autocorrelation
-      // res.ac_d = derivative(ac_t, ac);
-      // res.ac_d_mms = minmaxsum(res.ac_d);
-      // var ac_d_limit = res.ac_d_mms.max * 0.1;
-      // var peaks = res.ac_d.filter(v => v > -ac_d_limit && v < ac_d_limit);
-      // res.ac_p1_val = 0;
-      // res.ac_p1_idx = 0;
-      // res.ac_p2_val = 0;
-      // res.ac_p2_idx = 0;
-      // res.ac_p3_val = 0;
-      // res.ac_p3_idx = 0;
-      // res.ac_p4_val = 0;
-      // res.ac_p4_idx = 0;
-      // res.ac_p5_val = 0;
-      // res.ac_p5_idx = 0;
-      // if( peaks.length > 0) {
-      //     res.ac_p1_val = peaks[0];
-      //     res.ac_p1_idx = res.ad_d.indexOf(peaks[0]) + 1;
-      // }
-      // if( peaks.length > 1) {
-      //     res.ac_p2_val = peaks[1];
-      //     res.ac_p2_idx = res.ad_d.indexOf(peaks[1]) + 1;
-      // }
-      // if( peaks.length > 2) {
-      //     res.ac_p3_val = peaks[2];
-      //     res.ac_p3_idx = res.ad_d.indexOf(peaks[2]) + 1;
-      // }
-      // if( peaks.length > 3) {
-      //     res.ac_p4_val = peaks[3];
-      //     res.ac_p4_idx = res.ad_d.indexOf(peaks[3]) + 1;
-      // }
-      // if( peaks.length > 4) {
-      //     res.ac_p5_val = peaks[4];
-      //     res.ac_p5_idx = res.ad_d.indexOf(peaks[4]) + 1;
-      // }
-
-      // var hlindex = indexOfNLargestSmallest(ac, 10);
-      // for (var j = 1; j < 10; j++) {
-      //     var vn = "ac_top_" + j + "_idx";
-      //     res[vn] = hlindex.highest[j - 1];
-      //     var vn = "ac_top_" + j + "_val";
-      //     res[vn] = ac[hlindex.highest[j - 1]];
-      //     var vn = "ac_low_" + j + "_idx";
-      //     res[vn] = hlindex.lowest[j - 1];
-      //     var vn = "ac_low_" + j + "_val";
-      //     res[vn] = ac[hlindex.lowest[j - 1]];
-      // }
 
       /** add polynomials */
       res.lm1 = fit_polynomial(res.t, res.r, polynomial_1, {

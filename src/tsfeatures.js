@@ -2,7 +2,7 @@ import LM from 'ml-levenberg-marquardt';
 
 /** get version info*/
 function version() {
-    return "v0.1.1";
+    return "v0.1.2";
 }
 
 function polynomial_1([p0, p1]) {
@@ -157,7 +157,7 @@ function roots(t,r) {
     groups.forEach(group => {
         var idx = Math.floor(group.length / 2 + group[0]);
         peak_idxs.push(idx);
-        peak_vals.push(d[idx]);
+        peak_vals.push(r[idx]);
     });
 
     var res = {};
