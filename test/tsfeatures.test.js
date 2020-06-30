@@ -9,6 +9,7 @@ const tsfeatures = require('../src/tsfeatures');
 // });
 
 test('characteristics', () => {
+    console.log("characteristics");
     var t = [1, 2, 3, 4, 5];
     var r = [0, 10, 5, 0, 0];
     var c = tsfeatures.characteristics(t, r);
@@ -26,6 +27,7 @@ test('characteristics', () => {
 });
 
 test('characteristics 2', () => {
+    console.log("characteristics 2");
 
     var t = [];
     for (var i = 0; i < 101; i++) {
@@ -41,6 +43,8 @@ test('characteristics 2', () => {
 });
 
 test('deal with string input', () => {
+    console.log("deal with string input");
+
     var t = [1, 2, 3, 4, 5];
     var r = ["0", "10", "5", "0", "0"];
     var c = tsfeatures.characteristics(t, r);
@@ -79,6 +83,7 @@ test('linear trend', () => {
 });
 
 test('quantiles', () => {
+    console.log("quantiles");
     var t = [1,2,3];
     var r = [0,1,3];
     var c = tsfeatures.characteristics(t, r);
@@ -87,6 +92,7 @@ test('quantiles', () => {
 });
 
 test('quantiles 2', () => {
+    console.log("quantiles 2");
     var r = [7, 20, 16, 6, 58, 9, 20, 50, 23, 33, 8, 10, 15, 16, 104];
     expect(tsfeatures.quantile(r,0)).toBe(6.0);
     expect(tsfeatures.quantile(r,0.25)).toBe(9.5);
@@ -96,6 +102,7 @@ test('quantiles 2', () => {
 });
 
 test('derivative', () => {
+    console.log("derivative");
     var t = [1,2,3];
     var r = [0,1,2];
     var d = tsfeatures.derivative(t, r);
@@ -105,6 +112,7 @@ test('derivative', () => {
 });
 
 test('binning', () => {
+    console.log("binning");
     var t = [0,1,2,3,4,5,6,7];
     var r = [0,1,2,3,4,5,6,7];
     var c = tsfeatures.characteristics(t,r);
@@ -113,6 +121,7 @@ test('binning', () => {
 });
 
 test('roots', () => {
+    console.log("roots");
     var t = [];
     var r = [];
     for (var i = 0; i < 100; i++) {
@@ -127,6 +136,15 @@ test('roots', () => {
     expect(d.peak_idxs[0]).toBe(0);
     expect(d.peak_idxs[1]).toBe(17);
     expect(d.peak_idxs[2]).toBe(48);
+});
+
+test.only('smooth', () => {
+    console.log("smooth: test starting");
+    var t = [1,2,3,4];
+    var r = [0,3,7,0];
+    var c = tsfeatures.characteristics(t,r);
+    var s = tsfeatures.smooth(c, 2);
+    console.log(s);
 });
 
 // test('fft', () => {

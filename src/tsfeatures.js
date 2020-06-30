@@ -123,7 +123,7 @@ function derivative(t, r) {
 }
 
 /** get derivative and indicative roots (Nullstellen) (pre-check and conversion to numbers already done) */
-function roots(t,r) {
+function roots(t, r) {
     // get first derivative
     var d = derivative(t, r);
     // min, max, ...
@@ -139,10 +139,10 @@ function roots(t,r) {
     // check for multiple consecutive entries
     var groups = [];
     var group = [];
-    if( locs.length > 0) {
+    if (locs.length > 0) {
         group.push(locs[0]);
-        for( var i = 1; i < locs.length; i++) {
-            if( locs[i] - locs[i-1] === 1) {
+        for (var i = 1; i < locs.length; i++) {
+            if (locs[i] - locs[i - 1] === 1) {
                 group.push(locs[i]);
             } else {
                 groups.push(group);
@@ -172,27 +172,38 @@ function roots(t,r) {
 
 /** exponential smoothing with sigma as in 1/sigma/sqrt(2 pi) exp(-(x-x0)^2/2/sigma^2) */
 function smooth(c, sigma) {
+    // console.log("smooth: starting");
     var s = c.r.map(v => 0);
-    for( var i = 0; i < c.r.length; i++) {
+    // console.log(s);
+    for (var i = 0; i < c.r.length; i++) {
         var t0 = c.t[i];
         var lb = t0 - 3.0 * sigma;
         var ub = t0 + 3.0 * sigma;
         var f = c.r.map(v => 0); // filter function
         var sum = 0;
-        for( var j = 0; i < c.r.length; j++) {
-            if( c.t[j] >= lb && c.t[j] <= ub) {
-                f[j] = Math.exp(
-                        -Math.pow(c.t[j]-t0,2)
-                        /2.0
-                        /Math.pow(sigma,2)
+        var sum_f = 0;
+        // var cnt = 0;
+        // console.log(lb, ub);
+        for (var j = 0; j < c.r.length; j++) {
+            if (c.t[j] >= lb && c.t[j] <= ub) {
+                f[j] = 
+                    Math.exp(
+                        -Math.pow(c.t[j] - t0, 2)
+                        / 2.0
+                        / Math.pow(sigma, 2)
                     )
-                    /sigma/Math.sqrt(2.0 * Math.PI);
+                    / sigma / Math.sqrt(2.0 * Math.PI);
+                sum += f[j] * c.r[j];
+                sum_f += f[j];
+                // cnt++;
+                // console.log("f,c,sum,sum_f", f[j], c.r[j], sum, sum_f);
             }
-            sum += f[j] * c.r[j];
         }
-        s[j] = sum;
+        s[i] = sum / sum_f;
     }
     c.s = s;
+    //console.log(f);
+    //console.log(s);
     return c; // for chaining
 }
 
