@@ -138,6 +138,25 @@ test('roots', () => {
     expect(d.peak_idxs[2]).toBe(48);
 });
 
+test('roots 2', () => {
+
+    console.log("roots 2");
+    var t = [];
+    for (var i = 0; i < 101; i++) {
+        t.push(i);
+    }
+    var r = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 3, 4, 0, 5, 2, 5, 4, 2, 4, 5, 8, 6, 6, 3, 1, 4, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+    var d = tsfeatures.roots(t,r);
+    console.log(d);
+    expect(d.peak_vals.length > 0).toBe(true);
+    expect(d.peak_vals.length === 6).toBe(true);
+    expect(d.peak_vals[0]).toBe(0);
+    expect(d.peak_idxs[0]).toBe(0);
+    expect(d.peak_idxs[1]).toBe(12);
+    expect(d.peak_idxs[2]).toBe(16);
+});
+
 test('smooth', () => {
     console.log("smooth: test starting");
     var t = [1,2,3,4];

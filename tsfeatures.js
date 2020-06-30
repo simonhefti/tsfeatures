@@ -4120,6 +4120,9 @@ ${indent}columns: ${matrix.columns}
       peaks.forEach(v => {
           locs.push(d.indexOf(v));
       });
+      // remove duplicates
+      locs = locs.filter((v, i, a) => a.indexOf(v) === i);
+
       // check for multiple consecutive entries
       var groups = [];
       var group = [];
