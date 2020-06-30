@@ -2,7 +2,7 @@ import LM from 'ml-levenberg-marquardt';
 
 /** get version info*/
 function version() {
-    return "v0.1.2";
+    return "v0.1.3";
 }
 
 function polynomial_1([p0, p1]) {
@@ -170,6 +170,32 @@ function roots(t,r) {
     return res;
 }
 
+/** exponential smoothing with sigma as in 1/sigma/sqrt(2 pi) exp(-(x-x0)^2/2/sigma^2) */
+function smooth(c, sigma) {
+    var s = c.r.map(v => 0);
+    for( var i = 0; i < c.r.length; i++) {
+        var t0 = c.t[i];
+        var lb = t0 - 3.0 * sigma;
+        var ub = t0 + 3.0 * sigma;
+        var f = c.r.map(v => 0); // filter function
+        var sum = 0;
+        for( var j = 0; i < c.r.length; j++) {
+            if( c.t[j] >= lb && c.t[j] <= ub) {
+                f[j] = Math.exp(
+                        -Math.pow(c.t[j]-t0,2)
+                        /2.0
+                        /Math.pow(sigma,2)
+                    )
+                    /sigma/Math.sqrt(2.0 * Math.PI);
+            }
+            sum += f[j] * c.r[j];
+        }
+        s[j] = sum;
+    }
+    c.s = s;
+    return c; // for chaining
+}
+
 /** get base notions from time series (time t and observation r) */
 function characteristics(t, r) {
 
@@ -284,4 +310,5 @@ export {
     , roots
     , quantile
     , checkconv
+    , smooth
 }
