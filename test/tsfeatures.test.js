@@ -116,8 +116,10 @@ test('binning', () => {
     var t = [0,1,2,3,4,5,6,7];
     var r = [0,1,2,3,4,5,6,7];
     var c = tsfeatures.characteristics(t,r);
+    console.log(c);
     expect(c.r_bin_1).toBe(2);
-    expect(c.r_bin_4).toBe(2);
+    expect(c.r_bin_4).toBe(1);
+    expect(c.r_bin_5).toBe(2);
 });
 
 test('roots', () => {

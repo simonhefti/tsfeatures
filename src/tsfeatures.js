@@ -2,7 +2,7 @@ import LM from 'ml-levenberg-marquardt';
 
 /** get version info*/
 function version() {
-    return "v0.1.4";
+    return "v0.1.5";
 }
 
 function polynomial_1([p0, p1]) {
@@ -283,24 +283,39 @@ function characteristics(t, r) {
     res.r_q_3 = quantile(res.r, 0.75);
 
     /** binning */
-    // console.log("r2", r2);
-    // console.log("min", res.r_min, "max", res.r_max);
-    var lb = res.r_mms.min;
-    var hb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 0.25;
-    res.r_bin_1 = res.r.filter(v => v >= lb && v < hb).length; //count of values in first 25%
-    // console.log("lb", lb, "hb", hb, "v", r2.filter(v => v >= lb && v < hb), "res", res.r_bin_1);
-    lb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 0.25;
-    hb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 0.50;
-    res.r_bin_2 = res.r.filter(v => v >= lb && v < hb).length;
-    // console.log("lb", lb, "hb", hb, "v", r2.filter(v => v >= lb && v < hb), "res", res.r_bin_2);
-    lb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 0.50;
-    hb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 0.75;
-    res.r_bin_3 = res.r.filter(v => v >= lb && v < hb).length;
-    // console.log("lb", lb, "hb", hb, "v", r2.filter(v => v >= lb && v < hb), "res", res.r_bin_3);
-    lb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 0.75;
-    hb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 1.0;
-    res.r_bin_4 = res.r.filter(v => v >= lb && v <= hb).length;
-    // console.log("lb", lb, "hb", hb, "v", r2.filter(v => v >= lb && v <= hb), "res", res.r_bin_4);
+    var lims = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
+    for( var i = 0; i < lims.length - 1; i++) {
+        var lb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * lims[i];
+        var hb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * lims[i+1];
+        var featurename = "r_bin_" + (i+1);
+        if( i < lims.length -2) {
+            res[featurename] = res.r.filter(v => v >= lb && v < hb).length;
+        } else {
+            res[featurename] = res.r.filter(v => v >= lb && v <= hb).length;
+        }
+        // console.log(featurename);
+        // console.log(res);
+    }
+
+
+    // // console.log("r2", r2);
+    // // console.log("min", res.r_min, "max", res.r_max);
+    // var lb = res.r_mms.min;
+    // var hb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 0.25;
+    // res.r_bin_1 = res.r.filter(v => v >= lb && v < hb).length; //count of values in first 25%
+    // // console.log("lb", lb, "hb", hb, "v", r2.filter(v => v >= lb && v < hb), "res", res.r_bin_1);
+    // lb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 0.25;
+    // hb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 0.50;
+    // res.r_bin_2 = res.r.filter(v => v >= lb && v < hb).length;
+    // // console.log("lb", lb, "hb", hb, "v", r2.filter(v => v >= lb && v < hb), "res", res.r_bin_2);
+    // lb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 0.50;
+    // hb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 0.75;
+    // res.r_bin_3 = res.r.filter(v => v >= lb && v < hb).length;
+    // // console.log("lb", lb, "hb", hb, "v", r2.filter(v => v >= lb && v < hb), "res", res.r_bin_3);
+    // lb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 0.75;
+    // hb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * 1.0;
+    // res.r_bin_4 = res.r.filter(v => v >= lb && v <= hb).length;
+    // // console.log("lb", lb, "hb", hb, "v", r2.filter(v => v >= lb && v <= hb), "res", res.r_bin_4);
 
     return res;
 }
