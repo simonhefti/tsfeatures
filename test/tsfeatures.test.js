@@ -138,13 +138,14 @@ test('roots', () => {
     expect(d.peak_idxs[2]).toBe(48);
 });
 
-test.only('smooth', () => {
+test('smooth', () => {
     console.log("smooth: test starting");
     var t = [1,2,3,4];
     var r = [0,3,7,0];
-    var c = tsfeatures.characteristics(t,r);
-    var s = tsfeatures.smooth(c, 2);
+    var s = tsfeatures.smooth(t, r, 2);
     console.log(s);
+    expect(s[0]).toBe(2.449889558545865);
+    expect(s[3]).toBe(2.8422102772677342);
 });
 
 // test('fft', () => {

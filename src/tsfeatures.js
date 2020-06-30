@@ -2,7 +2,7 @@ import LM from 'ml-levenberg-marquardt';
 
 /** get version info*/
 function version() {
-    return "v0.1.3";
+    return "v0.1.4";
 }
 
 function polynomial_1([p0, p1]) {
@@ -51,7 +51,7 @@ function checkconv(t, r) {
 }
 
 
-/** get min, max, sum, avg */
+/** get min, max, sum, avg (assumes number) */
 function minmaxsum(y) {
     var res = {};
     res.max = Number.MIN_VALUE;
@@ -107,7 +107,7 @@ function autocorrelation(c, lag) {
     return res;
 }
 
-/** calculate derivative (pre-check and conversion to numbers already done) */
+/** calculate derivative (assumes pre-check and conversion to numbers already done) */
 function derivative(t, r) {
 
     var res = [];
@@ -124,8 +124,10 @@ function derivative(t, r) {
 
 /** get derivative and indicative roots (Nullstellen) (pre-check and conversion to numbers already done) */
 function roots(t, r) {
+    // smooth
+    var s = smooth(t, r, 1);
     // get first derivative
-    var d = derivative(t, r);
+    var d = derivative(t, s);
     // min, max, ...
     var d_mms = minmaxsum(d);
     // find roots (values)
@@ -171,40 +173,31 @@ function roots(t, r) {
 }
 
 /** exponential smoothing with sigma as in 1/sigma/sqrt(2 pi) exp(-(x-x0)^2/2/sigma^2) */
-function smooth(c, sigma) {
-    // console.log("smooth: starting");
-    var s = c.r.map(v => 0);
-    // console.log(s);
-    for (var i = 0; i < c.r.length; i++) {
-        var t0 = c.t[i];
+function smooth(t, r, sigma) {
+    var s = r.map(v => 0);
+    for (var i = 0; i < r.length; i++) {
+        var t0 = t[i];
         var lb = t0 - 3.0 * sigma;
         var ub = t0 + 3.0 * sigma;
-        var f = c.r.map(v => 0); // filter function
+        var f = r.map(v => 0); // filter function
         var sum = 0;
         var sum_f = 0;
-        // var cnt = 0;
-        // console.log(lb, ub);
-        for (var j = 0; j < c.r.length; j++) {
-            if (c.t[j] >= lb && c.t[j] <= ub) {
+        for (var j = 0; j < r.length; j++) {
+            if (t[j] >= lb && t[j] <= ub) {
                 f[j] = 
                     Math.exp(
-                        -Math.pow(c.t[j] - t0, 2)
+                        -Math.pow(t[j] - t0, 2)
                         / 2.0
                         / Math.pow(sigma, 2)
                     )
                     / sigma / Math.sqrt(2.0 * Math.PI);
-                sum += f[j] * c.r[j];
+                sum += f[j] * r[j];
                 sum_f += f[j];
-                // cnt++;
-                // console.log("f,c,sum,sum_f", f[j], c.r[j], sum, sum_f);
             }
         }
         s[i] = sum / sum_f;
     }
-    c.s = s;
-    //console.log(f);
-    //console.log(s);
-    return c; // for chaining
+    return s; // for chaining
 }
 
 /** get base notions from time series (time t and observation r) */
