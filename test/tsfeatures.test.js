@@ -1,3 +1,4 @@
+import LM from 'ml-levenberg-marquardt';
 const tsfeatures = require('../src/tsfeatures');
 
 // test('indexOfNLargestSmallest', () => {
@@ -168,6 +169,59 @@ test('smooth', () => {
     expect(s[0]).toBe(2.449889558545865);
     expect(s[3]).toBe(2.8422102772677342);
 });
+
+test('gaussian', () => {
+    var g1 = tsfeatures.gaussian([10, 15, 1]);
+    var res = g1(15);
+    // console.log(res);
+    expect(g1(15)).toBe(3.9894228040143274);
+});
+
+test('fit gaussian', () => {
+    console.log("fit gaussian");
+    var t = [];
+    var r = [];
+    var g1 = tsfeatures.gaussian([10, 15, 1]);
+    for (var i = 0; i < 30; i++) {
+      t.push(i);
+      r.push(g1(i) + Math.random());
+    }
+    console.log(r);
+
+    var lm = LM({ x: t, y: r }, tsfeatures.gaussian, {
+        damping: 1.5,
+        initialValues: [10, 15, 1]
+    });
+
+    var c1 = lm.parameterValues[1] > 14.9 && lm.parameterValues[1] < 15.1;
+
+    expect(c1).toBe(true);
+
+    console.log(lm);
+});
+
+test('fit lorentzian', () => {
+    console.log("fit lorentzian");
+    var t = [];
+    var r = [];
+    var g1 = tsfeatures.asym_lorentzian([10, 15, 1,2]);
+    for (var i = 0; i < 50; i++) {
+      t.push(i);
+      r.push(g1(i) + Math.random());
+    }
+
+    var lm = LM({ x: t, y: r }, tsfeatures.asym_lorentzian, {
+        damping: 1.5,
+        initialValues: [10, 15, 1, 1]
+    });
+
+    var c1 = lm.parameterValues[1] > 14.9 && lm.parameterValues[1] < 15.1;
+
+    expect(c1).toBe(true);
+
+    console.log(lm);
+});
+
 
 // test('fft', () => {
 //     var res = tsfeatures.frequencies([0,1,0,1]);

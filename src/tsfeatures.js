@@ -26,6 +26,39 @@ function fit_polynomial(x, y, polynomial, options) {
     return res;
 }
 
+function asym_lorentzian([A, t0, sigma1, sigma2]) {
+    function f(t) {
+        var res = 2.0 * A;
+        var d = 1.0;
+        if (t < t0) {
+            d = Math.pow((t - t0) / sigma1, 2) + 1;
+        } else {
+            d = Math.pow((t - t0) / sigma2, 2) + 1;
+        }
+        res /= d;
+        return res;
+    }
+    return f;
+}
+
+function gaussian([A, t0, sigma]) {
+    return t => A * Math.exp(-Math.pow(t - t0, 2) / 2.0 / Math.pow(sigma, 2)) / sigma / Math.sqrt(2.0 * Math.PI);
+}
+
+// function gaussian([A, t0, sigma]) {
+//     function f(t) {
+//         return A
+//             * Math.exp(
+//                 -Math.pow(t - t0, 2)
+//                 / 2.0
+//                 / Math.pow(sigma, 2)
+//             )
+//             / sigma / Math.sqrt(2.0 * Math.PI);
+//     };
+//     return f;
+// }
+
+
 /** check correct array sizes and convert to number or throw error */
 function checkconv(t, r) {
 
@@ -187,7 +220,7 @@ function smooth(t, r, sigma) {
         var sum_f = 0;
         for (var j = 0; j < r.length; j++) {
             if (t[j] >= lb && t[j] <= ub) {
-                f[j] = 
+                f[j] =
                     Math.exp(
                         -Math.pow(t[j] - t0, 2)
                         / 2.0
@@ -277,6 +310,21 @@ function characteristics(t, r) {
         initialValues: [1, 1, 1, 1]
     });
 
+    var _t0 = res.mon_1;
+    var _s = Math.sqrt(res.mon_2 - Math.pow(res.mon_1, 2));
+
+    res.lm_gaussian = LM({ x: res.t, y: res.r }, gaussian, {
+        damping: 1.5,
+        initialValues: [res.r_mms.max, _t0, _s]
+    });
+
+    res.lm_asym_lorentzian = LM({ x: res.t, y: res.r }, asym_lorentzian, {
+        damping: 1.5,
+        initialValues: [res.r_mms.max, _t0, _s, _s]
+    });
+
+
+
     /** add quantiles */
     res.r_q_1 = quantile(res.r, 0.25);
     res.r_q_2 = quantile(res.r, 0.50);
@@ -284,11 +332,11 @@ function characteristics(t, r) {
 
     /** binning */
     var lims = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
-    for( var i = 0; i < lims.length - 1; i++) {
+    for (var i = 0; i < lims.length - 1; i++) {
         var lb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * lims[i];
-        var hb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * lims[i+1];
-        var featurename = "r_bin_" + (i+1);
-        if( i < lims.length -2) {
+        var hb = res.r_mms.min + (res.r_mms.max - res.r_mms.min) * lims[i + 1];
+        var featurename = "r_bin_" + (i + 1);
+        if (i < lims.length - 2) {
             res[featurename] = res.r.filter(v => v >= lb && v < hb).length;
         } else {
             res[featurename] = res.r.filter(v => v >= lb && v <= hb).length;
@@ -333,4 +381,6 @@ export {
     , quantile
     , checkconv
     , smooth
+    , gaussian
+    , asym_lorentzian
 }
