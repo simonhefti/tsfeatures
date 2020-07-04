@@ -3983,6 +3983,9 @@ ${indent}columns: ${matrix.columns}
     };
   }
 
+  const IGREG2 = 2299161;
+  const IGREG1 = (15 + 31 * (10 + 12 * 1582));
+
   /** get version info*/
   function version() {
       return "v0.1.5";
@@ -4215,7 +4218,167 @@ ${indent}columns: ${matrix.columns}
           }
           s[i] = sum / sum_f;
       }
-      return s; // for chaining
+      return s;
+  }
+
+  /** create new t array from t_start to t_stop with t_increment; time unit is expressed in ints (seconds or minutes or days etc) */
+  function t_array_from_to(t_start, t_stop, t_increment) {
+  }
+
+  /** exponential smoothing on target time array t_new */
+  function smoothto(t, r, sigma, t_new) {
+
+      var s = t_new.map(v => 0);
+
+      for (var i = 0; i < t_new.length; i++) {
+
+          var t0 = t_new[i];
+          var lb = t0 - 3.0 * sigma;
+          var ub = t0 + 3.0 * sigma;
+
+          var f = t_new.map(v => 0); // filter function
+          var sum = 0;
+          var sum_f = 0;
+          for (var j = 0; j < r.length; j++) {
+              if (t_new[j] >= lb && t_new[j] <= ub) {
+                  f[j] =
+                      Math.exp(
+                          -Math.pow(t_new[j] - t0, 2)
+                          / 2.0
+                          / Math.pow(sigma, 2)
+                      )
+                      / sigma / Math.sqrt(2.0 * Math.PI);
+                  sum += f[j] * r[j];
+                  sum_f += f[j];
+              }
+          }
+          s[i] = sum / sum_f;
+      }
+
+      var res = {};
+      res.t = t_new;
+      res.r = s;
+
+      return res;
+  }
+
+  /** helper, find unique entries in array */
+  function unique(a) {
+      return a.filter((v, i, a) => a.indexOf(v) === i);
+  }
+
+  /** test if objects is undefined, null, or 0 length, or full of empty values */
+  function isEmpty(val) {
+      if (val === undefined) return true;
+      if (val === null) return true;
+      if (val.length <= 0) return true;
+      if (Array.isArray(val)) {
+          var cnt = 0;
+          val.forEach(el => {
+              if (isEmpty(el)) cnt++;
+          });
+          if (cnt === val.length) return true;
+      }
+      return false;
+  }
+
+  /** get day of year (1 for Jan first) */
+  function dayofyear(date) {
+      var jd1 = julianday(new Date(date.getFullYear(), 0, 1), { includeTime: false });
+      var jd2 = julianday(date, { includeTime: false });
+      return jd2 - jd1 + 1;
+  }
+
+  /** calculate julian day for given date */
+  function julianday(date, options = {}) {
+      if (isEmpty(date)) {
+          return 0;
+      }
+      var includeTime = true;
+      if (!isEmpty(options)) {
+          if (!isEmpty(options.includeTime)) {
+              includeTime = options.includeTime;
+          }
+      }
+      var res = 0,
+          ja = 0,
+          jy = 0,
+          jm = 0;
+
+      var year = date.getFullYear();
+
+      jy = year;
+
+      if (jy < 0) ++jy;
+      var mm = date.getMonth() + 1;
+      if (mm > 2) {
+          jm = mm + 1;
+      } else {
+          --jy;
+          jm = mm + 13;
+      }
+
+      var id = date.getDate();
+      res = Math.floor(365.25 * jy) + Math.floor(30.6001 * jm) + id + 1720995;
+      if (id + 31 * (mm + 12 * year) >= IGREG1) {
+          ja = Math.floor(0.01 * jy);
+          res += 2 - ja + Math.floor(0.25 * ja);
+      }
+
+      if (includeTime) {
+          res += (date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()) / 24 / 3600;
+      }
+
+      return res;
+  }
+
+
+  /** convert julian day number to date (after Numerical Recipies) */
+  function fromJulianDay(julianday, options = {}) {
+      var ja = 0,
+          jalpha = 0,
+          jb = 0,
+          jc = 0,
+          jd = 0,
+          je = 0;
+
+      var includeTime = true;
+      if (!isEmpty(options)) {
+          if (!isEmpty(options.includeTime)) {
+              includeTime = options.includeTime;
+          }
+      }
+      var fraction = (julianday - Math.floor(julianday)) * 24 * 3600;
+
+      if (julianday >= IGREG2) {
+          jalpha = Math.floor((julianday - 1867216 - 0.25) / 36524.25);
+          ja = julianday + 1 + jalpha - Math.floor(0.25 * jalpha);
+      } else {
+          ja = jd;
+      }
+
+      jb = ja + 1524;
+      jc = Math.floor(6680.0 + (jb - 2439870 - 122.1) / 365.25);
+      jd = Math.floor(365 * jc + 0.25 * jc);
+      je = Math.floor((jb - jd) / 30.6001);
+      var day = jb - jd - Math.floor(30.6001 * je);
+      var mm = je - 1;
+      if (mm > 12) mm -= 12;
+      var year = jc - 4715;
+      if (mm > 2) --year;
+      if (year <= 0) --year;
+
+      var res = new Date(year, mm - 1, day, 0, 0, 0, 0);
+
+      if (includeTime) {
+          var hr = Math.floor(fraction / 3600);
+          fraction -= hr * 3600;
+          var min = Math.floor(fraction / 60);
+          var sec = Math.round(fraction - min * 60);
+
+          res = new Date(year, mm - 1, day, hr, min, sec, 0);
+      }
+      return res;
   }
 
   /** get base notions from time series (time t and observation r) */
@@ -4354,9 +4517,13 @@ ${indent}columns: ${matrix.columns}
   exports.autocorrelation = autocorrelation;
   exports.characteristics = characteristics;
   exports.checkconv = checkconv;
+  exports.dayofyear = dayofyear;
   exports.derivative = derivative;
   exports.fit_polynomial = fit_polynomial;
+  exports.fromJulianDay = fromJulianDay;
   exports.gaussian = gaussian;
+  exports.isEmpty = isEmpty;
+  exports.julianday = julianday;
   exports.minmaxsum = minmaxsum;
   exports.moment = moment;
   exports.polynomial_1 = polynomial_1;
@@ -4367,6 +4534,9 @@ ${indent}columns: ${matrix.columns}
   exports.quantile = quantile;
   exports.roots = roots;
   exports.smooth = smooth;
+  exports.smoothto = smoothto;
+  exports.t_array_from_to = t_array_from_to;
+  exports.unique = unique;
   exports.version = version;
 
   Object.defineProperty(exports, '__esModule', { value: true });
