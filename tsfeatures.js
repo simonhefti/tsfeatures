@@ -4340,6 +4340,16 @@ ${indent}columns: ${matrix.columns}
       return jd2 - jd1 + 1;
   }
 
+  /** calculate julian day (including time as fraction of day) for given date */
+  function juliandayf(date) {
+      return julianday(date, {includeTime: true});
+  }
+
+  /** calculate julian day (without time) for given date */
+  function juliandayi(date) {
+      return julianday(date, {includeTime: false});
+  }
+
   /** calculate julian day for given date */
   function julianday(date, options = {}) {
       if (isEmpty(date)) {
@@ -4383,6 +4393,15 @@ ${indent}columns: ${matrix.columns}
       return res;
   }
 
+  /** convert julian day number (with time fraction) to date (after Numerical Recipies) */
+  function fromJulianDayf(julianday) {
+      return fromJulianDay(julianday, {includeTime: true});
+  }
+
+  /** convert julian day number (without time fraction) to date (after Numerical Recipies) */
+  function fromJulianDayi(julianday) {
+      return fromJulianDay(julianday, {includeTime: false});
+  }
 
   /** convert julian day number to date (after Numerical Recipies) */
   function fromJulianDay(julianday, options = {}) {
@@ -4573,9 +4592,13 @@ ${indent}columns: ${matrix.columns}
   exports.derivative_s = derivative_s;
   exports.fit_polynomial = fit_polynomial;
   exports.fromJulianDay = fromJulianDay;
+  exports.fromJulianDayf = fromJulianDayf;
+  exports.fromJulianDayi = fromJulianDayi;
   exports.gaussian = gaussian;
   exports.isEmpty = isEmpty;
   exports.julianday = julianday;
+  exports.juliandayf = juliandayf;
+  exports.juliandayi = juliandayi;
   exports.minmaxsum = minmaxsum;
   exports.moment = moment;
   exports.polynomial_1 = polynomial_1;

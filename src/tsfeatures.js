@@ -364,6 +364,16 @@ function dayofyear(date) {
     return jd2 - jd1 + 1;
 }
 
+/** calculate julian day (including time as fraction of day) for given date */
+function juliandayf(date) {
+    return julianday(date, {includeTime: true});
+}
+
+/** calculate julian day (without time) for given date */
+function juliandayi(date) {
+    return julianday(date, {includeTime: false});
+}
+
 /** calculate julian day for given date */
 function julianday(date, options = {}) {
     if (isEmpty(date)) {
@@ -407,6 +417,15 @@ function julianday(date, options = {}) {
     return res;
 }
 
+/** convert julian day number (with time fraction) to date (after Numerical Recipies) */
+function fromJulianDayf(julianday) {
+    return fromJulianDay(julianday, {includeTime: true});
+}
+
+/** convert julian day number (without time fraction) to date (after Numerical Recipies) */
+function fromJulianDayi(julianday) {
+    return fromJulianDay(julianday, {includeTime: false});
+}
 
 /** convert julian day number to date (after Numerical Recipies) */
 function fromJulianDay(julianday, options = {}) {
@@ -609,7 +628,11 @@ export {
     , unique
     // julian day
     , julianday
+    , juliandayf
+    , juliandayi
     , fromJulianDay
+    , fromJulianDayf
+    , fromJulianDayi
     , dayofyear
     // smoothing to new tine array
     , t_array_from_to
