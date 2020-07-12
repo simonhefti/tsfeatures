@@ -163,16 +163,27 @@ function derivative_s(t, r, delta_t) {
 
     var res = [];
     for (var i = 0; i < r.length; i++) {
-        var r1 = smoothat(t, r, delta_t/2.0, t[i] - delta_t / 2.0);
-        var r2 = smoothat(t, r, delta_t/2.0, t[i] + delta_t / 2.0);
-        var dr = r2 - r1;
-        var d = dr / delta_t;
-        console.log(i, r1, r2, dr, d);
-        res.push(d);
+        res.push(derivativeat(t, r, t[i], delta_t));
+        // var r1 = smoothat(t, r, delta_t/2.0, t[i] - delta_t / 2.0);
+        // var r2 = smoothat(t, r, delta_t/2.0, t[i] + delta_t / 2.0);
+        // var dr = r2 - r1;
+        // var d = dr / delta_t;
+        // console.log(i, r1, r2, dr, d);
+        // res.push(d);
     }
 
     return res;
 }
+
+function derivativeat(t, r, t0, delta_t) {
+
+    var r1 = smoothat(t, r, delta_t/2.0, t0 - delta_t / 2.0);
+    var r2 = smoothat(t, r, delta_t/2.0, t0 + delta_t / 2.0);
+    var dr = r2 - r1;
+    var d = dr / delta_t;
+    return d;
+}
+
 
 /** get derivative and indicative roots (Nullstellen) (pre-check and conversion to numbers already done) */
 function roots(t, r) {
@@ -617,6 +628,7 @@ export {
     , fit_polynomial
     , derivative
     , derivative_s
+    , derivativeat
     , roots
     , quantile
     , checkconv

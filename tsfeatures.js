@@ -4145,16 +4145,27 @@ ${indent}columns: ${matrix.columns}
 
       var res = [];
       for (var i = 0; i < r.length; i++) {
-          var r1 = smoothat(t, r, delta_t/2.0, t[i] - delta_t / 2.0);
-          var r2 = smoothat(t, r, delta_t/2.0, t[i] + delta_t / 2.0);
-          var dr = r2 - r1;
-          var d = dr / delta_t;
-          console.log(i, r1, r2, dr, d);
-          res.push(d);
+          res.push(derivativeat(t, r, t[i], delta_t));
+          // var r1 = smoothat(t, r, delta_t/2.0, t[i] - delta_t / 2.0);
+          // var r2 = smoothat(t, r, delta_t/2.0, t[i] + delta_t / 2.0);
+          // var dr = r2 - r1;
+          // var d = dr / delta_t;
+          // console.log(i, r1, r2, dr, d);
+          // res.push(d);
       }
 
       return res;
   }
+
+  function derivativeat(t, r, t0, delta_t) {
+
+      var r1 = smoothat(t, r, delta_t/2.0, t0 - delta_t / 2.0);
+      var r2 = smoothat(t, r, delta_t/2.0, t0 + delta_t / 2.0);
+      var dr = r2 - r1;
+      var d = dr / delta_t;
+      return d;
+  }
+
 
   /** get derivative and indicative roots (Nullstellen) (pre-check and conversion to numbers already done) */
   function roots(t, r) {
@@ -4590,6 +4601,7 @@ ${indent}columns: ${matrix.columns}
   exports.dayofyear = dayofyear;
   exports.derivative = derivative;
   exports.derivative_s = derivative_s;
+  exports.derivativeat = derivativeat;
   exports.fit_polynomial = fit_polynomial;
   exports.fromJulianDay = fromJulianDay;
   exports.fromJulianDayf = fromJulianDayf;
