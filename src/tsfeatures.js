@@ -177,8 +177,10 @@ function derivative_s(t, r, delta_t) {
 
 function derivativeat(t, r, t0, delta_t) {
 
-    var r1 = smoothat(t, r, delta_t/2.0, t0 - delta_t / 2.0);
-    var r2 = smoothat(t, r, delta_t/2.0, t0 + delta_t / 2.0);
+    var dhalf = delta_t / 2.0;
+
+    var r1 = smoothat(t, r, t0 - delta_t / 2.0, dhalf);
+    var r2 = smoothat(t, r, t0 + delta_t / 2.0, dhalf);
     var dr = r2 - r1;
     var d = dr / delta_t;
     return d;
@@ -243,7 +245,7 @@ function smooth(t, r, sigma) {
     var s = r.map(v => 0);
     for (var i = 0; i < r.length; i++) {
         var t0 = t[i];
-        s[i] = smoothat(t, r, sigma, t0);
+        s[i] = smoothat(t, r, t0, sigma);
         // var lb = t0 - 3.0 * sigma;
         // var ub = t0 + 3.0 * sigma;
         // var f = r.map(v => 0); // filter function

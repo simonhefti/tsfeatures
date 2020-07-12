@@ -77,7 +77,7 @@ test('linear trend', () => {
     var c = tsfeatures.characteristics(tmp_t, tmp_v);
     console.log(c.lm1);
     var res = false;
-    if( c.lm1.parameterValues[0] > -3.1 & c.lm1.parameterValues[0] < -2.9) {
+    if (c.lm1.parameterValues[0] > -3.1 & c.lm1.parameterValues[0] < -2.9) {
         res = true;
     }
     expect(res).toBe(true);
@@ -85,8 +85,8 @@ test('linear trend', () => {
 
 test('quantiles', () => {
     console.log("quantiles");
-    var t = [1,2,3];
-    var r = [0,1,3];
+    var t = [1, 2, 3];
+    var r = [0, 1, 3];
     var c = tsfeatures.characteristics(t, r);
     // console.log(c.lm1);
     expect(c.r_q_1).toBe(0.5);
@@ -95,17 +95,17 @@ test('quantiles', () => {
 test('quantiles 2', () => {
     console.log("quantiles 2");
     var r = [7, 20, 16, 6, 58, 9, 20, 50, 23, 33, 8, 10, 15, 16, 104];
-    expect(tsfeatures.quantile(r,0)).toBe(6.0);
-    expect(tsfeatures.quantile(r,0.25)).toBe(9.5);
-    expect(tsfeatures.quantile(r,0.50)).toBe(16.0);
-    expect(tsfeatures.quantile(r,0.75)).toBe(28.0);
-    expect(tsfeatures.quantile(r,1.0)).toBe(104.0);
+    expect(tsfeatures.quantile(r, 0)).toBe(6.0);
+    expect(tsfeatures.quantile(r, 0.25)).toBe(9.5);
+    expect(tsfeatures.quantile(r, 0.50)).toBe(16.0);
+    expect(tsfeatures.quantile(r, 0.75)).toBe(28.0);
+    expect(tsfeatures.quantile(r, 1.0)).toBe(104.0);
 });
 
 test('derivative', () => {
     console.log("derivative");
-    var t = [1,2,3,4,5,6];
-    var r = [0,1,2,4,5,6];
+    var t = [1, 2, 3, 4, 5, 6];
+    var r = [0, 1, 2, 4, 5, 6];
     var d = tsfeatures.derivative(t, r);
     expect(d[0]).toBe(0);
     expect(d[1]).toBe(1);
@@ -114,12 +114,12 @@ test('derivative', () => {
 
 test('derivative_s', () => {
     console.log("derivative_s");
-    var t = [1,2,3,4,5,6];
-    var r = [1,2,3,4,5,6];
+    var t = [1, 2, 3, 4, 5, 6];
+    var r = [1, 2, 3, 4, 5, 6];
     var d = tsfeatures.derivative_s(t, r, 1);
     console.log(d);
     //expect(d[0]).toBe(0);
-    for( var i = 1; i < r.length - 1; i++) {
+    for (var i = 1; i < r.length - 1; i++) {
         expect(d[i]).toBeGreaterThanOrEqual(0.9);
         expect(d[i]).toBeLessThan(1.1);
     }
@@ -128,9 +128,9 @@ test('derivative_s', () => {
 
 test('binning', () => {
     console.log("binning");
-    var t = [0,1,2,3,4,5,6,7];
-    var r = [0,1,2,3,4,5,6,7];
-    var c = tsfeatures.characteristics(t,r);
+    var t = [0, 1, 2, 3, 4, 5, 6, 7];
+    var r = [0, 1, 2, 3, 4, 5, 6, 7];
+    var c = tsfeatures.characteristics(t, r);
     console.log(c);
     expect(c.r_bin_1).toBe(2);
     expect(c.r_bin_4).toBe(1);
@@ -142,10 +142,10 @@ test('roots', () => {
     var t = [];
     var r = [];
     for (var i = 0; i < 100; i++) {
-      t.push(i);
-      r.push(Math.sin(i * 0.1));
+        t.push(i);
+        r.push(Math.sin(i * 0.1));
     }
-    var d = tsfeatures.roots(t,r);
+    var d = tsfeatures.roots(t, r);
     console.log(d);
     expect(d.peak_vals.length > 0).toBe(true);
     expect(d.peak_vals.length === 3).toBe(true);
@@ -164,7 +164,7 @@ test('roots 2', () => {
     }
     var r = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 3, 4, 0, 5, 2, 5, 4, 2, 4, 5, 8, 6, 6, 3, 1, 4, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-    var d = tsfeatures.roots(t,r);
+    var d = tsfeatures.roots(t, r);
     console.log(d);
     expect(d.peak_vals.length > 0).toBe(true);
     expect(d.peak_vals.length === 6).toBe(true);
@@ -176,8 +176,8 @@ test('roots 2', () => {
 
 test('smooth', () => {
     console.log("smooth: test starting");
-    var t = [1,2,3,4];
-    var r = [0,3,7,0];
+    var t = [1, 2, 3, 4];
+    var r = [0, 3, 7, 0];
     var s = tsfeatures.smooth(t, r, 2);
     console.log(s);
     expect(s[0]).toBe(2.449889558545865);
@@ -197,8 +197,8 @@ test('fit gaussian', () => {
     var r = [];
     var g1 = tsfeatures.gaussian([10, 15, 1]);
     for (var i = 0; i < 30; i++) {
-      t.push(i);
-      r.push(g1(i) + Math.random());
+        t.push(i);
+        r.push(g1(i) + Math.random());
     }
     console.log(r);
 
@@ -220,10 +220,10 @@ test('fit lorentzian', () => {
     console.log("fit lorentzian");
     var t = [];
     var r = [];
-    var g1 = tsfeatures.asym_lorentzian([10, 15, 1,2]);
+    var g1 = tsfeatures.asym_lorentzian([10, 15, 1, 2]);
     for (var i = 0; i < 50; i++) {
-      t.push(i);
-      r.push(g1(i) + Math.random());
+        t.push(i);
+        r.push(g1(i) + Math.random());
     }
 
     var lm = LM({ x: t, y: r }, tsfeatures.asym_lorentzian, {
@@ -241,25 +241,25 @@ test('fit lorentzian', () => {
 });
 
 test('day of year', () => {
-    expect(tsfeatures.dayofyear(new Date(2020,0,1))).toBe(1);
-    expect(tsfeatures.dayofyear(new Date(2020,0,30))).toBe(30);
-    expect(tsfeatures.dayofyear(new Date(2020,1,1))).toBe(32);
+    expect(tsfeatures.dayofyear(new Date(2020, 0, 1))).toBe(1);
+    expect(tsfeatures.dayofyear(new Date(2020, 0, 30))).toBe(30);
+    expect(tsfeatures.dayofyear(new Date(2020, 1, 1))).toBe(32);
 });
 
 
 test('julian day 1.1.2020', () => {
 
-    var o = {includeTime: false};
+    var o = { includeTime: false };
 
-    expect(tsfeatures.julianday(new Date(2020,0,1,0,0,0,0))).toBe(2458850.0);
-    expect(tsfeatures.julianday(new Date(2020,0,1,0,0,0,0), o)).toBe(2458850.0);    
-    expect(tsfeatures.julianday(new Date(2020,0,1,2,3,4,5), o)).toBe(2458850.0);    
-    expect(tsfeatures.julianday(new Date(2020,3,19,0,0,0,0), o)).toBe(2458959.0);    
+    expect(tsfeatures.julianday(new Date(2020, 0, 1, 0, 0, 0, 0))).toBe(2458850.0);
+    expect(tsfeatures.julianday(new Date(2020, 0, 1, 0, 0, 0, 0), o)).toBe(2458850.0);
+    expect(tsfeatures.julianday(new Date(2020, 0, 1, 2, 3, 4, 5), o)).toBe(2458850.0);
+    expect(tsfeatures.julianday(new Date(2020, 3, 19, 0, 0, 0, 0), o)).toBe(2458959.0);
 });
 
 test('from 2458850 to 1.1.2020', () => {
 
-    var o = {includeTime: false};
+    var o = { includeTime: false };
 
     var d1 = tsfeatures.fromJulianDay(2458850);
     expect(d1.getFullYear()).toBe(2020);
@@ -287,9 +287,9 @@ test('julian day roundtrip', () => {
     expect(d2.getMinutes()).toBe(d.getMinutes());
     expect(d2.getSeconds()).toBe(d.getSeconds());
 
-    var o = {includeTime: false};
+    var o = { includeTime: false };
 
-    for( var i = 0; i < 20; i++) {
+    for (var i = 0; i < 20; i++) {
         d = new Date();
         var d3 = tsfeatures.fromJulianDay(tsfeatures.julianday(d));
         expect(d3.getSeconds()).toBe(d.getSeconds());
@@ -309,14 +309,14 @@ test('smooth at', () => {
 
     var t = [];
     var r = [];
-    for(var i = 0; i < 10; i++) {
+    for (var i = 0; i < 10; i++) {
         t.push(i);
         r.push(i);
     }
 
-    var s = tsfeatures.smoothat(t,r,0.1,5);
+    var s = tsfeatures.smoothat(t, r, 5, 0.1);
     expect(s).toBe(5);
-    s = tsfeatures.smoothat(t,r,0.1,4.5);
+    s = tsfeatures.smoothat(t, r, 4.5, 0.1);
     expect(s).toBe(4.5);
 
 });
