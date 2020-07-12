@@ -276,7 +276,7 @@ function t_array_from_to(t_start, t_stop, t_increment) {
 }
 
 /** exponential smoothing at specific t0 */
-function smoothat(t, r, sigma, t0) {
+function smoothat(t, r, t0, sigma) {
 
     var res = 0;
 
