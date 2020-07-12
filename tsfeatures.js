@@ -4198,31 +4198,67 @@ ${indent}columns: ${matrix.columns}
       var s = r.map(v => 0);
       for (var i = 0; i < r.length; i++) {
           var t0 = t[i];
-          var lb = t0 - 3.0 * sigma;
-          var ub = t0 + 3.0 * sigma;
-          var f = r.map(v => 0); // filter function
-          var sum = 0;
-          var sum_f = 0;
-          for (var j = 0; j < r.length; j++) {
-              if (t[j] >= lb && t[j] <= ub) {
-                  f[j] =
-                      Math.exp(
-                          -Math.pow(t[j] - t0, 2)
-                          / 2.0
-                          / Math.pow(sigma, 2)
-                      )
-                      / sigma / Math.sqrt(2.0 * Math.PI);
-                  sum += f[j] * r[j];
-                  sum_f += f[j];
-              }
-          }
-          s[i] = sum / sum_f;
+          s[i] = smoothat(t, r, sigma, t0);
+          // var lb = t0 - 3.0 * sigma;
+          // var ub = t0 + 3.0 * sigma;
+          // var f = r.map(v => 0); // filter function
+          // var sum = 0;
+          // var sum_f = 0;
+          // for (var j = 0; j < r.length; j++) {
+          //     if (t[j] >= lb && t[j] <= ub) {
+          //         f[j] =
+          //             Math.exp(
+          //                 -Math.pow(t[j] - t0, 2)
+          //                 / 2.0
+          //                 / Math.pow(sigma, 2)
+          //             )
+          //             / sigma / Math.sqrt(2.0 * Math.PI);
+          //         sum += f[j] * r[j];
+          //         sum_f += f[j];
+          //     }
+          // }
+          // s[i] = sum / sum_f;
       }
       return s;
   }
 
   /** create new t array from t_start to t_stop with t_increment; time unit is expressed in ints (seconds or minutes or days etc) */
   function t_array_from_to(t_start, t_stop, t_increment) {
+  }
+
+  /** exponential smoothing at specific t0 */
+  function smoothat(t, r, sigma, t0) {
+
+      var res = 0;
+
+      var lb = t0 - 6.0 * sigma;
+      var ub = t0 + 6.0 * sigma;
+      // console.log(t0, lb, ub);
+
+      var f = t.map(v => 0); // filter function
+      var sum = 0;
+      var sum_f = 0;
+      for (var j = 0; j < r.length; j++) {
+          if (t[j] >= lb && t[j] <= ub) {
+              f[j] =
+                  Math.exp(
+                      -Math.pow(t[j] - t0, 2)
+                      / 2.0
+                      / Math.pow(sigma, 2)
+                  )
+                  / sigma / Math.sqrt(2.0 * Math.PI);
+              sum += f[j] * r[j];
+              sum_f += f[j];
+              // console.log(sum);
+              // console.log(sum_f);
+          }
+      }
+      if( 0 === sum_f ) {
+          throw new "not enough data within +- 6 sigma to smooth";
+      }
+      res = sum / sum_f;
+      // console.log(res);
+      return res;
   }
 
   /** exponential smoothing on target time array t_new */
@@ -4236,14 +4272,14 @@ ${indent}columns: ${matrix.columns}
           var lb = t0 - 3.0 * sigma;
           var ub = t0 + 3.0 * sigma;
 
-          var f = t_new.map(v => 0); // filter function
+          var f = t.map(v => 0); // filter function
           var sum = 0;
           var sum_f = 0;
           for (var j = 0; j < r.length; j++) {
-              if (t_new[j] >= lb && t_new[j] <= ub) {
+              if (t[j] >= lb && t[j] <= ub) {
                   f[j] =
                       Math.exp(
-                          -Math.pow(t_new[j] - t0, 2)
+                          -Math.pow(t[j] - t0, 2)
                           / 2.0
                           / Math.pow(sigma, 2)
                       )
@@ -4534,6 +4570,7 @@ ${indent}columns: ${matrix.columns}
   exports.quantile = quantile;
   exports.roots = roots;
   exports.smooth = smooth;
+  exports.smoothat = smoothat;
   exports.smoothto = smoothto;
   exports.t_array_from_to = t_array_from_to;
   exports.unique = unique;

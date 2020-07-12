@@ -156,7 +156,7 @@ test('roots 2', () => {
     expect(d.peak_vals.length === 6).toBe(true);
     expect(d.peak_vals[0]).toBe(0);
     expect(d.peak_idxs[0]).toBe(0);
-    expect(d.peak_idxs[1]).toBe(12);
+    expect(d.peak_idxs[1]).toBe(10);
     expect(d.peak_idxs[2]).toBe(16);
 });
 
@@ -193,7 +193,9 @@ test('fit gaussian', () => {
         initialValues: [10, 15, 1]
     });
 
-    var c1 = lm.parameterValues[1] > 14.9 && lm.parameterValues[1] < 15.1;
+    console.log(lm);
+
+    var c1 = lm.parameterValues[1] > 14.8 && lm.parameterValues[1] < 15.2;
 
     expect(c1).toBe(true);
 
@@ -214,6 +216,8 @@ test('fit lorentzian', () => {
         damping: 1.5,
         initialValues: [10, 15, 1, 1]
     });
+
+    console.log(lm);
 
     var c1 = lm.parameterValues[1] > 14.9 && lm.parameterValues[1] < 15.1;
 
@@ -284,6 +288,22 @@ test('julian day roundtrip', () => {
         expect(d3.getMinutes()).toBe(0);
         expect(d3.getSeconds()).toBe(0);
     }
+
+});
+
+test('smooth at', () => {
+
+    var t = [];
+    var r = [];
+    for(var i = 0; i < 10; i++) {
+        t.push(i);
+        r.push(i);
+    }
+
+    var s = tsfeatures.smoothat(t,r,0.1,5);
+    expect(s).toBe(5);
+    s = tsfeatures.smoothat(t,r,0.1,4.5);
+    expect(s).toBe(4.5);
 
 });
 
