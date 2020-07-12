@@ -104,12 +104,26 @@ test('quantiles 2', () => {
 
 test('derivative', () => {
     console.log("derivative");
-    var t = [1,2,3];
-    var r = [0,1,2];
+    var t = [1,2,3,4,5,6];
+    var r = [0,1,2,4,5,6];
     var d = tsfeatures.derivative(t, r);
     expect(d[0]).toBe(0);
     expect(d[1]).toBe(1);
     expect(d[2]).toBe(1);
+});
+
+test('derivative_s', () => {
+    console.log("derivative_s");
+    var t = [1,2,3,4,5,6];
+    var r = [1,2,3,4,5,6];
+    var d = tsfeatures.derivative_s(t, r, 1);
+    console.log(d);
+    //expect(d[0]).toBe(0);
+    for( var i = 1; i < r.length - 1; i++) {
+        expect(d[i]).toBeGreaterThanOrEqual(0.9);
+        expect(d[i]).toBeLessThan(1.1);
+    }
+    // expect(d[2]).toBe(1);
 });
 
 test('binning', () => {

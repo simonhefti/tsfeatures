@@ -4140,6 +4140,22 @@ ${indent}columns: ${matrix.columns}
       return res;
   }
 
+  /** calculate derivative (assumes pre-check and conversion to numbers already done) */
+  function derivative_s(t, r, delta_t) {
+
+      var res = [];
+      for (var i = 0; i < r.length; i++) {
+          var r1 = smoothat(t, r, delta_t/2.0, t[i] - delta_t / 2.0);
+          var r2 = smoothat(t, r, delta_t/2.0, t[i] + delta_t / 2.0);
+          var dr = r2 - r1;
+          var d = dr / delta_t;
+          console.log(i, r1, r2, dr, d);
+          res.push(d);
+      }
+
+      return res;
+  }
+
   /** get derivative and indicative roots (Nullstellen) (pre-check and conversion to numbers already done) */
   function roots(t, r) {
       // smooth
@@ -4269,26 +4285,25 @@ ${indent}columns: ${matrix.columns}
       for (var i = 0; i < t_new.length; i++) {
 
           var t0 = t_new[i];
-          var lb = t0 - 3.0 * sigma;
-          var ub = t0 + 3.0 * sigma;
 
-          var f = t.map(v => 0); // filter function
-          var sum = 0;
-          var sum_f = 0;
-          for (var j = 0; j < r.length; j++) {
-              if (t[j] >= lb && t[j] <= ub) {
-                  f[j] =
-                      Math.exp(
-                          -Math.pow(t[j] - t0, 2)
-                          / 2.0
-                          / Math.pow(sigma, 2)
-                      )
-                      / sigma / Math.sqrt(2.0 * Math.PI);
-                  sum += f[j] * r[j];
-                  sum_f += f[j];
-              }
-          }
-          s[i] = sum / sum_f;
+          // var f = t.map(v => 0); // filter function
+          // var sum = 0;
+          // var sum_f = 0;
+          // for (var j = 0; j < r.length; j++) {
+          //     if (t[j] >= lb && t[j] <= ub) {
+          //         f[j] =
+          //             Math.exp(
+          //                 -Math.pow(t[j] - t0, 2)
+          //                 / 2.0
+          //                 / Math.pow(sigma, 2)
+          //             )
+          //             / sigma / Math.sqrt(2.0 * Math.PI);
+          //         sum += f[j] * r[j];
+          //         sum_f += f[j];
+          //     }
+          // }
+          // s[i] = sum / sum_f;
+          s[i] = smoothat(t, r, sigma, t0);
       }
 
       var res = {};
@@ -4555,6 +4570,7 @@ ${indent}columns: ${matrix.columns}
   exports.checkconv = checkconv;
   exports.dayofyear = dayofyear;
   exports.derivative = derivative;
+  exports.derivative_s = derivative_s;
   exports.fit_polynomial = fit_polynomial;
   exports.fromJulianDay = fromJulianDay;
   exports.gaussian = gaussian;

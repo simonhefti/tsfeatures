@@ -158,6 +158,22 @@ function derivative(t, r) {
     return res;
 }
 
+/** calculate derivative (assumes pre-check and conversion to numbers already done) */
+function derivative_s(t, r, delta_t) {
+
+    var res = [];
+    for (var i = 0; i < r.length; i++) {
+        var r1 = smoothat(t, r, delta_t/2.0, t[i] - delta_t / 2.0);
+        var r2 = smoothat(t, r, delta_t/2.0, t[i] + delta_t / 2.0);
+        var dr = r2 - r1;
+        var d = dr / delta_t;
+        console.log(i, r1, r2, dr, d);
+        res.push(d);
+    }
+
+    return res;
+}
+
 /** get derivative and indicative roots (Nullstellen) (pre-check and conversion to numbers already done) */
 function roots(t, r) {
     // smooth
@@ -294,23 +310,24 @@ function smoothto(t, r, sigma, t_new) {
         var lb = t0 - 3.0 * sigma;
         var ub = t0 + 3.0 * sigma;
 
-        var f = t.map(v => 0); // filter function
-        var sum = 0;
-        var sum_f = 0;
-        for (var j = 0; j < r.length; j++) {
-            if (t[j] >= lb && t[j] <= ub) {
-                f[j] =
-                    Math.exp(
-                        -Math.pow(t[j] - t0, 2)
-                        / 2.0
-                        / Math.pow(sigma, 2)
-                    )
-                    / sigma / Math.sqrt(2.0 * Math.PI);
-                sum += f[j] * r[j];
-                sum_f += f[j];
-            }
-        }
-        s[i] = sum / sum_f;
+        // var f = t.map(v => 0); // filter function
+        // var sum = 0;
+        // var sum_f = 0;
+        // for (var j = 0; j < r.length; j++) {
+        //     if (t[j] >= lb && t[j] <= ub) {
+        //         f[j] =
+        //             Math.exp(
+        //                 -Math.pow(t[j] - t0, 2)
+        //                 / 2.0
+        //                 / Math.pow(sigma, 2)
+        //             )
+        //             / sigma / Math.sqrt(2.0 * Math.PI);
+        //         sum += f[j] * r[j];
+        //         sum_f += f[j];
+        //     }
+        // }
+        // s[i] = sum / sum_f;
+        s[i] = smoothat(t, r, sigma, t0);
     }
 
     var res = {};
@@ -580,6 +597,7 @@ export {
     , polynomial_1, polynomial_2, polynomial_3, polynomial_4, polynomial_5
     , fit_polynomial
     , derivative
+    , derivative_s
     , roots
     , quantile
     , checkconv
